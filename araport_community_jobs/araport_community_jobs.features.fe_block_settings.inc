@@ -48,5 +48,39 @@ community/jobs/*',
     'visibility' => 1,
   );
 
+  $export['views-job_postings-block_1'] = array(
+    'cache' => -1,
+    'css_class' => '',
+    'custom' => 0,
+    'delta' => 'job_postings-block_1',
+    'module' => 'views',
+    'node_types' => array(),
+    'pages' => 'community/jobs
+community/jobs/*',
+    'roles' => array(),
+    'themes' => array(
+      'araport_theme' => array(
+        'region' => 'sidebar_second',
+        'status' => 1,
+        'theme' => 'araport_theme',
+        'weight' => 0,
+      ),
+      'bartik' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'bartik',
+        'weight' => 0,
+      ),
+      'seven' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'seven',
+        'weight' => 0,
+      ),
+    ),
+    'title' => '',
+    'visibility' => 1,
+  );
+
   return $export;
 }

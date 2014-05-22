@@ -15,16 +15,16 @@ function araport_community_jobs_default_Workflow() {
     "options" : [],
     "states" : {
       "1" : {"sid":"1","wid":"1","weight":"-50","sysid":"1","state":"(creation)","status":"1"},
-      "3" : {"sid":"3","wid":"1","weight":"-19","sysid":"0","state":"Submitted","status":"1"},
-      "2" : {"sid":"2","wid":"1","weight":"-18","sysid":"0","state":"Approve","status":"1"}
+      "2" : {"sid":"2","wid":"1","weight":"-19","sysid":"0","state":"Submitted","status":"1"},
+      "3" : {"sid":"3","wid":"1","weight":"-18","sysid":"0","state":"Approve","status":"1"}
     },
     "transitions" : [
-      {"tid":"8","sid":"1","target_sid":"3","roles":{"-1":-1},"wid":"1","name":"1_3","label":"","rdf_mapping":[]},
-      {"tid":"7","sid":"1","target_sid":"2","roles":{"3":3,"4":4},"wid":"1","name":"1_2","label":"","rdf_mapping":[]},
-      {"tid":"3","sid":"3","target_sid":"3","roles":{"-1":-1,"3":3,"4":4},"wid":"1","name":"3_3","label":"","rdf_mapping":[]},
-      {"tid":"9","sid":"3","target_sid":"2","roles":{"3":3,"4":4},"wid":"1","name":"3_2","label":"","rdf_mapping":[]},
-      {"tid":"10","sid":"2","target_sid":"3","roles":{"3":3,"4":4},"wid":"1","name":"2_3","label":"","rdf_mapping":[]},
-      {"tid":"2","sid":"2","target_sid":"2","roles":{"-1":-1,"3":3,"4":4},"wid":"1","name":"2_2","label":"","rdf_mapping":[]}
+      {"tid":"1","sid":"1","target_sid":"2","roles":{"-1":-1},"wid":"1","name":"1_3","label":"","rdf_mapping":[]},
+      {"tid":"2","sid":"1","target_sid":"3","roles":{"3":"3","4":"4"},"wid":"1","name":"1_2","label":"","rdf_mapping":[]},
+      {"tid":"3","sid":"2","target_sid":"2","roles":{"-1":-1,"3":"3","4":"4"},"wid":"1","name":"3_3","label":"","rdf_mapping":[]},
+      {"tid":"4","sid":"2","target_sid":"3","roles":{"3":"3","4":"4"},"wid":"1","name":"3_2","label":"","rdf_mapping":[]},
+      {"tid":"5","sid":"3","target_sid":"2","roles":{"3":"3","4":"4"},"wid":"1","name":"2_3","label":"","rdf_mapping":[]},
+      {"tid":"6","sid":"3","target_sid":"3","roles":{"-1":-1,"3":"3","4":"4"},"wid":"1","name":"2_2","label":"","rdf_mapping":[]}
     ],
     "label" : "Approve Job Postings",
     "typeMap" : [],
