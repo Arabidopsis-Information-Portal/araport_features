@@ -2,9 +2,8 @@ name = Araport Community Jobs
 description = Araport community members can post jobs (moderated).
 core = 7.x
 package = Araport
-version = 7.x-1.0
+version = 7.x-1.1
 project = araport_community_jobs
-
 dependencies[] = araport_preview2
 dependencies[] = ctools
 dependencies[] = entity

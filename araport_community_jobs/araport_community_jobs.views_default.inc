@@ -42,8 +42,17 @@ function araport_community_jobs_views_default_views() {
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = '## No results';
-  $handler->display->display_options['empty']['area']['format'] = 'formatted_text';
+  $handler->display->display_options['empty']['area']['content'] = '<div class="jumbotron">
+<h2>No jobs posted!</h2>
+<p>
+<?php if (user_access(\'create job_posting content\')) { ?>
+Are you hiring? <?php print l(\'Post a job now!\', \'node/add/job-posting\'); ?>
+<?php } else { ?>
+Looking for a job? Please check back again as more job postings become available.
+<?php } ?>
+</p>
+</div>';
+  $handler->display->display_options['empty']['area']['format'] = 'php_code';
   /* Field: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';

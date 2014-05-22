@@ -90,6 +90,9 @@ function araport_community_jobs_strongarm() {
       'workflow_tab' => array(
         'custom_settings' => FALSE,
       ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
