@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the araport_answers feature.
+ */
+
+include_once 'araport_answers.features.inc';
