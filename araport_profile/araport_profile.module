@@ -1,0 +1,74 @@
+<?php
+/**
+ * @file
+ * Code for the Araport Profile feature.
+ */
+
+include_once 'araport_profile.features.inc';
+
+
+function araport_profile_form_user_profile_form_alter(&$form, &$form_state) {
+  if ($form['#user_category'] === 'account') {
+    $weight = $form['account']['name']['#weight'];
+    $form['account']['mail']['#weight'] = $weight - 1; // make email appear above username
+  }
+}
+
+function araport_profile_form_profile2_edit_profile_form_alter(&$form, &$form_state){
+  $form['profile_profile']['#type'] = 'container';
+  $form['profile_profile']['#prefix'] = '<div class="row">';
+  $form['profile_profile']['#suffix'] = '</div>';
+
+  // move personal info fields into fieldset
+  $form['profile_profile']['personal_info'] = array(
+    '#type' => 'fieldset',
+    '#tree' => 0,
+    '#title' => t('Personal info'),
+    '#prefix' => '<div class="col-md-6">',
+    '#suffix' => '</div>',
+    '#weight' => 0
+  );
+
+  $personal_fields = array(
+    'first_name',
+    'last_name',
+    'phone',
+    'mobile_phone',
+    'citizenship',
+    'ethnicity',
+    'city',
+    'state_province',
+    'country',
+    'discovery_vector'
+  );
+
+  foreach ($personal_fields as $field) {
+    $form['profile_profile']['personal_info']['field_'.$field] = $form['profile_profile']['field_'.$field];
+    $form['profile_profile']['personal_info']['field_'.$field]['#parents'] = array('profile_profile', 'field_'.$field);
+    unset($form['profile_profile']['field_'.$field]);
+  }
+
+  // move professional info into fieldset
+  $form['profile_profile']['professional_info'] = array(
+    '#type' => 'fieldset',
+    '#tree' => 0,
+    '#title' => t('Professional info'),
+    '#prefix' => '<div class="col-md-6">',
+    '#suffix' => '</div>',
+    '#weight' => 1
+  );
+
+  $professional_fields = array(
+    'institution',
+    'department',
+    'occupation',
+    'research_areas',
+    'funding_agencies',
+  );
+
+  foreach ($professional_fields as $field) {
+    $form['profile_profile']['professional_info']['field_'.$field] = $form['profile_profile']['field_'.$field];
+    $form['profile_profile']['professional_info']['field_'.$field]['#parents'] = array('profile_profile', 'field_'.$field);
+    unset($form['profile_profile']['field_'.$field]);
+  }
+}
