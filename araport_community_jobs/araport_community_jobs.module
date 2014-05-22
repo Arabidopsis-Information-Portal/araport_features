@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Araport Community Jobs feature.
+ */
+
+include_once 'araport_community_jobs.features.inc';
