@@ -4,6 +4,7 @@ core = 7.x
 package = Araport
 version = 7.x-1.0
 project = araport_community_jobs
+
 dependencies[] = araport_preview2
 dependencies[] = ctools
 dependencies[] = entity

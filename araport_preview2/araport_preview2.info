@@ -1,7 +1,10 @@
-name = araport_preview2
+name = Araport Preview 2
 description = Araport Features for Preview 2
 core = 7.x
 package = Araport
+version = 7.x-1.0
+project = araport_community_jobs
+
 dependencies[] = agave
 dependencies[] = agave_users
 dependencies[] = araport_profile
