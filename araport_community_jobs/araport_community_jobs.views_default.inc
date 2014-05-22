@@ -130,6 +130,8 @@ Looking for a job? Please check back again as more job postings become available
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block_1');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Job Posting Moderation';
   $handler->display->display_options['defaults']['pager'] = FALSE;
   $handler->display->display_options['pager']['type'] = 'mini';
   $handler->display->display_options['pager']['options']['items_per_page'] = '25';
@@ -184,6 +186,7 @@ Looking for a job? Please check back again as more job postings become available
     2 => '2',
   );
   $handler->display->display_options['filters']['sid']['expose']['workflow_reduce_wid'] = FALSE;
+  $handler->display->display_options['block_description'] = 'Job Posting Moderation';
   $export['job_postings'] = $view;
 
   return $export;
