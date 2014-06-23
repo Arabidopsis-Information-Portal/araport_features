@@ -1,0 +1,10 @@
+name = "Araport Apps"
+description = "Module for including and running apps in Araport."
+core = 7.x
+package = Araport
+version = 7.x-1.0
+project = araport_apps
+
+dependencies[] = agave
+
+scripts[] = blast.js

@@ -1,0 +1,283 @@
+<?php
+/**
+ * I don't even.
+ *
+ */
+
+function araport_apps_init() {
+  error_log('Hi, araport_apps_init()', TRUE);
+}
+
+function araport_apps_form($form, &$form_state) {
+
+  error_log('araport_apps_form');
+  global $user;
+  if ($user->uid) {
+    $agave_token = agave_load_api_token($user);
+    $bearer_token = $agave_token->getAccessToken();
+  } else {
+    $bearer_token = 'Nope';
+  }
+  //stuff for testing tokens and junk
+  $form['token'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Token I\'m a dev thing. Pls ignore.'),
+    '#default_value' => $bearer_token,
+    '#size' => 40,
+    '#maxlength' => 40,
+    '#description' => t('Dev stuff, look away!'),
+  );
+  
+  //Text area for sequence input
+  $form['sequence_input'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Blast Input Sequence',
+    '#default_value' => '',
+    '#description' =>t('Enter your search sequence above.'),
+    '#rows' => '10',
+    '#columns' =>'60',
+    '#resizeable' => TRUE,
+    '#required' => TRUE,    
+  );
+  
+  $form['dbs'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Databases'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+
+  $avail_dbs = _get_available_databases();
+  $nukes = array();
+  $peps  = array();
+  if(($avail_dbs === FALSE) || (count($avail_dbs) < 1)) {
+    drupal_set_message(t('Error! Could not find databases to run Blast against.'), 'error', FALSE);
+  } else {
+      foreach($avail_dbs as $db) {
+        if($db->type === 'nucleotide') {
+          $nukes[$db->filename] = t($db->label);
+        } else {
+          $peps[$db->filename] = t($db->label);
+        }
+      }
+
+      $form['dbs']['nuc_databases'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Select the nucleotide databases to search against'),
+        '#options' => $nukes,
+      );
+
+      $form['dbs']['prot_databases'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Select the protein databases to search against'),
+        '#options' => $peps, 
+      );
+  }
+  
+  //hidden field to stuff the JSON doc in
+  $form['app_definition'] = array(
+    '#type' => 'hidden',
+    '#value' => '',
+  );
+  
+
+//ADVANCED OPTIONS
+  $form['blast_options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Advanced Blast Options +'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#attributes' => array('class' => array('advanced-blast-options')),
+  );
+  $form['blast_options']['matrix'] = array(
+    '#type' => 'select',
+    '#title' => t('Weight Matrix'),
+    '#options' => array(
+      'blosum45' => 'blosum45',
+      'blosum50' => 'blosum50',
+      'blosum62' => 'blosum62',
+      'blosum80' => 'blosum80',
+      'blosum90' => 'blosum90',
+      'pam30' => 'pam30',
+      'pam70' => 'pam70',
+      'pam250' => 'pam250',
+    ),
+    '#default_value' => 'blosum62',
+  );
+
+  $form['blast_options']['max_scores'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Max Scores'),
+    '#default_value' => 25,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('Restricts the number of short descriptions of matching sequences reported to the number specified; default limit is 25 descriptions.'),
+  );
+
+  $form['blast_options']['expectation'] = array(
+    '#type' => 'select',
+    '#title' => t('Expectation'),
+    '#options' => array(
+      0.0001 => '0.0001',
+      0.001 => '0.001',
+      0.01 => '0.01',
+      0.1 => '0.1',
+      1 => '1',
+      10 => '10',
+      100 => '100',
+      1000 => '1000',
+    ),
+    '#default_value' => '10',
+    '#description' => t('The statistical significance threshold for reporting matches against database sequences; the default value is 10, such that 10 matches are expected to be found merely by chance, according to the stochastic model of Karlin and Altschul (1990). If the statistical significance ascribed to a match is greater than the EXPECTATION threshold, the match will not be reported. Lower EXPECT thresholds are more stringent, leading to fewer chance matches being reported. Fractional values are acceptable.'),
+  );
+
+  $form['blast_options']['max_alignments'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Max Alignments'),
+    '#default_value' => 15,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('Restricts database sequences to the number specified for which high-scoring segment pairs (HSPs) are reported.'),
+  );
+
+  $form['blast_options']['nucleic_mismatch'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Nucleic Mismatch'),
+    '#default_value' => -3,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('Penalty for a mismatch in the BLAST™ portion of run.'),
+  );
+
+  $form['blast_options']['gapped_alignments'] = array(
+    '#type' => 'select',
+    '#title' => t('Gapped Alignments'),
+    '#options' => array(
+      TRUE => 'On',
+      FALSE => 'Off',
+    ),
+    '#default_value' => TRUE,
+    '#description' => t('Whether to allow gapped alignments.'),
+  );
+
+  $form['blast_options']['nucleic_match'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Nucleic Match'),
+    '#default_value' => 1,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('Reward for a match in the BLAST™ portion of run.'),
+  );
+
+  $form['blast_options']['gap_opening_penalty'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Gap Opening Penalty'),
+    '#default_value' => 0,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('Cost to open a gap; a 0 in the field means to use the default. Supported values for BLASTP, BLASTX, TBLASTN, and TBLASTX are limited.'),
+  );
+
+  $form['blast_options']['gap_opening_penalty'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Gap Opening Penalty'),
+    '#default_value' => 0,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('Cost to open a gap; a 0 in the field means to use the default. Supported values for BLASTP, BLASTX, TBLASTN, and TBLASTX are limited.'),
+  );  
+  $form['blast_options']['extension_threshold'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Extension Threshold'),
+    '#default_value' => 0,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('The threshold above which BLAST™ will extend a hit found. The hit is based on finding a word of a certain size.'),
+  );  
+  $form['blast_options']['word_size'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Word Size'),
+    '#default_value' => 0,
+    '#size' => 4,
+    '#maxlength' => 10,
+    '#description' => t('The size of the initial word that must be matched between the database and the query sequence.'),
+  );
+////end advanced options
+    
+  $form['submit_button'] = array(
+    '#type' => 'submit',
+    '#value' => t('Run Blast+'),
+  );  
+  return $form;
+}
+
+/*
+ * Validation function for the form. 
+ * requires: input sequence and at least one DB to blast against 
+ */
+function araport_apps_form_validate($form, &$form_state) {
+  //error_log(print_R($form_state,TRUE));
+  $seq = $form_state['values']['sequence_input'];
+  if(!$seq) {
+    form_set_error('sequence_input',t('You must enter a sequence.'));
+  }
+  
+  $dbs = _get_selected_databases($form_state);
+  error_log(print_R($dbs,TRUE));
+  
+  if(count($dbs) < 1 ) {
+    form_set_error('dbs', t('You must select at least one database.'));
+  }
+}
+
+/*
+ * form submit function
+ *
+ */
+function araport_apps_form_submit($form, &$form_state) {
+  error_log('araport_apps_form_submit called');
+}
+
+/*
+ * Add this to the top level menu under "Science Apps -> Araport Blast+"
+ *   at url /apps/blast
+ *
+ */
+
+function araport_apps_menu() {
+  $items = array();
+  $items['apps/blast'] = array( //this creates a URL that will call this form at "examples/form-example"
+    'title' => 'Araport Blast+', //page title
+    'description' => 'Araport Blast+',
+    'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
+    'page arguments' => array('araport_apps_form'), 
+    'access callback' => TRUE,
+    'expanded' => TRUE,
+  );
+  return $items;
+}
+
+function _get_available_databases() { 
+  global $user;
+  $agaveFile = new AgaveFile(agave_load_api_token($user), variable_get('agave_tenant_base_url', ''));
+  $stuff = $agaveFile->getFile('araport-compute-00', '/databases/blast/index.json');
+//  error_log(print_r($stuff,1));
+  return $stuff->databases;  
+}
+
+function _get_selected_databases(&$form_state) {
+  $dbs = array();
+  foreach($form_state['values']['nuc_databases'] as $key => $value) {
+    if($value) {
+        $dbs[$key] = $value;
+    }
+  }
+  foreach($form_state['values']['prot_databases'] as $key => $value) {
+    if($value) {
+        $dbs[$key] = $value;
+    }
+  }
+  return $dbs;
+}
+
+
