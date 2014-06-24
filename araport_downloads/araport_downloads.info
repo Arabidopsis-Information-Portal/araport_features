@@ -8,5 +8,3 @@ dependencies[] = agave_files
 stylesheets[all][] = araport_downloads.css
 
 scripts[] = araport_downloads.js
-
-files[] = includes/DownloadStream.php
