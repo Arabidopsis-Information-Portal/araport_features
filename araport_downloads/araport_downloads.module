@@ -1,0 +1,162 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function araport_downloads_menu(){
+  $items = array();
+
+  $items['araport_downloads'] = array(
+    'title' => 'Downloads',
+    'description' => '',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'araport_downloads_view',
+    'access arguments' => array('access araport datasets')
+  );
+
+  $items['araport_download_file'] = array(
+    'title' => 'Downloads',
+    'description' => '',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'araport_download_file',
+    'access arguments' => array('access araport datasets')
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function araport_downloads_permission(){
+  $perms = array();
+
+  $perms['access araport datasets'] = array(
+    'title' => 'Access & download hosted datasets',
+    'description' => 'Users with this permission can browse and download publicly hosted AIP datasets.',
+  );
+
+  return $perms;
+}
+
+function _araport_download_stream($ch, $data) {
+  print $data;
+  return strlen($data);
+}
+
+/**
+ * It would be nice to not have to do the CURL opts here, but APIClient only
+ * supports JSON at this time.
+ */
+function araport_download_file(){
+  global $user;
+  $args = func_get_args();
+  if (count($args)) {
+    $token = agave_load_api_token($user);
+    $url = variable_get('agave_tenant_base_url', '') . '/files/v2/media/system/araport-public-files/' . implode('/', $args);
+    $name = array_pop($args);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $token->getAccessToken()));
+    curl_setopt($ch, CURLOPT_SSLVERSION,3);
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_WRITEFUNCTION, '_araport_download_stream');
+
+    drupal_add_http_header('Content-disposition', 'attachment; filename='.$name);
+
+    curl_exec($ch);
+    curl_close($ch);
+    drupal_exit();
+
+  } else {
+    drupal_not_found();
+  }
+}
+
+function araport_downloads_view(){
+
+  $path = '/';
+  $args = func_get_args();
+  if (count($args)) {
+    $path = $path . implode('/', func_get_args()) . '/';
+  }
+
+  $client = agave_get_api_client();
+  $listing = new AgaveFileListing($client, 'araport-public-files', $path);
+  return array(
+    'info' => array(
+      '#markup' => '<h3>Viewing <code>'.$path.'</code></h3>'
+    ),
+    'file_listing' => array(
+      '#theme' => 'araport_downloads_listing',
+      '#listing' => $listing->getList(),
+      '#open_directories' => TRUE
+    )
+  );
+}
+
+function araport_downloads_theme() {
+  return array(
+    'araport_downloads_listing' => array(
+      'variables' => array(
+        'listing' => array(),
+        'open_directories' => FALSE
+      )
+    ),
+    'araport_downloads_directory' => array(
+      'variables' => array('dir' => NULL)
+    ),
+    'araport_downloads_file' => array(
+      'variables' => array('file' => NULL)
+    )
+  );
+}
+
+function theme_araport_downloads_listing($variables) {
+  $listing = $variables['listing'];
+
+  $open_directories = $variables['open_directories'];
+  $items = array();
+
+  foreach ($listing as $item) {
+    $render = array();
+    if ($item->name == '.') {
+      continue;
+    }
+    if ($item->type == 'dir') {
+      $render['#theme'] = 'araport_downloads_directory';
+      $render['#dir'] = $item;
+      if ($open_directories) {
+        $client = agave_get_api_client();
+        $dir_contents = new AgaveFileListing($client, 'araport-public-files', '/'.$item->path);
+        $render = array(
+          'dir' => $render,
+          'contents' => array(
+            '#theme' => 'araport_downloads_listing',
+            '#listing' => $dir_contents->getList()
+          )
+        );
+      }
+    } else {
+      $render['#theme'] = 'araport_downloads_file';
+      $render['#file'] = $item;
+    }
+    $items[] = drupal_render($render);
+  }
+
+  $render = array(
+    '#theme' => 'item_list',
+    '#items' => $items
+  );
+  return drupal_render($render);
+}
+
+function theme_araport_downloads_directory($variables) {
+  return l('<i class="fa fa-folder"></i> ' . $variables['dir']->name, 'araport_downloads/' . $variables['dir']->path, array('html' => TRUE));
+}
+
+function theme_araport_downloads_file($variables) {
+  return l('<i class="fa fa-file"></i> ' . $variables['file']->name, 'araport_download_file/' . $variables['file']->path, array('html' => TRUE));
+}

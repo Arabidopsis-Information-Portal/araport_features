@@ -1,0 +1,12 @@
+name = araport_downloads
+description = AIP publicly hosted downloads. This is a custom wrapper around Agave/Files API.
+package = Araport
+version = 7.x-1.0
+core = 7.x
+dependencies[] = agave_files
+
+stylesheets[all][] = araport_downloads.css
+
+scripts[] = araport_downloads.js
+
+files[] = includes/DownloadStream.php
