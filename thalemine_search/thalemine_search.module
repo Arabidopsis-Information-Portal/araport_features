@@ -8,7 +8,7 @@ function thalemine_search_search_info() {
 }
 
 function _thalemine_search_service_url($keys, $conditions) {
-  return 'https://apps.araport.org/thalemine/service/search?q='.$keys.'*';
+  return 'https://apps.araport.org/thalemine/service/search?q='.$keys;
 }
 
 function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
