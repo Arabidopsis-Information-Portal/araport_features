@@ -1,0 +1,8 @@
+name = Thalemine Search
+description = Search integration for various AIP Thalemine.
+package = Araport
+version = 7.x-1.0
+core = 7.x
+
+
+stylesheets[all][] = thalemine_search.css

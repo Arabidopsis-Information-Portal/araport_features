@@ -1,0 +1,96 @@
+<?php
+
+function thalemine_search_search_info() {
+  return array(
+    'title' => 'Thalemine',
+    'path' => 'thalemine'
+  );
+}
+
+function _thalemine_search_thalemine_search_url($keys, $conditions) {
+  return 'https://apps.araport.org/thalemine/service/search?q='.$keys.'*';
+}
+
+function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_SSLVERSION,3);
+  curl_setopt($ch, CURLOPT_URL, _thalemine_search_thalemine_search_url($keys, $conditions));
+  $response_json = curl_exec($ch);
+  curl_close($ch);
+
+  $response = json_decode($response_json);
+
+  // error_log(print_r($response, 1));
+
+  $results = array();
+
+  foreach($response->results as $result) {
+    $results[] = array(
+      'link' => 'https://apps.araport.org/thalemine/report.do?id='.$result->id,
+      'type' => $result->type,
+      'title' => _thalemine_search_result_title($result),
+      'snippet' => theme('thalemine_search_result__'.strtolower($result->type), array('result' => $result))
+    );
+  }
+
+  return $results;
+}
+
+function thalemine_search_theme() {
+  return array(
+    'thalemine_search_result' => array(
+      'pattern' => 'thalemine_search_result__',
+      'variables' => array(
+        'result' => NULL
+      )
+    )
+  );
+}
+
+function _thalemine_search_result_title($result) {
+  switch($result->type) {
+    case 'Gene':
+    case 'MRNA':
+    case 'Protein':
+      return $result->fields->primaryIdentifier;
+    case 'Publication':
+      return $result->fields->title;
+    case 'Author':
+    case 'Lab':
+    case 'InteractionTerm':
+    case 'GOTerm':
+    case 'SOTerm':
+    case 'Sample':
+    case 'OntologyTerm':
+      return $result->fields->name;
+    case 'Synonym':
+      return $result->fields->value;
+    default:
+      // just return first object key
+      $fields = (Array)$result->fields;
+      $title = array_shift($fields);
+      return $title;
+  }
+}
+
+function _thalemine_search_nice_field_name($field_name) {
+  return ucfirst(preg_replace('/[.]/', ' ', preg_replace_callback('/([A-Z])/', function($matches) {
+    return ' '.strtolower($matches[0]);
+  }, $field_name)));
+}
+
+function theme_thalemine_search_result($variables) {
+  $result = $variables['result'];
+  $output = '<dl class="dl-horizontal">';
+  $output .= '<dt>Result type</dt><dd><i class="fa fa-tag"></i> ' . $result->type . '</dd>';
+  foreach ($result->fields as $name => $value) {
+    $nice_name = _thalemine_search_nice_field_name($name);
+    $output .= '<dt>'.$nice_name.'</dt>';
+    $output .= '<dd>'.$value.'</dd>';
+  }
+  $output .= '</dl>';
+  return $output;
+}
