@@ -37,7 +37,53 @@ function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
     );
   }
 
+  $results[] = array(
+    'link' => '',
+    'type' => 'facets',
+    'extra' => $response->facets
+  );
+
   return $results;
+}
+
+function thalemine_search_search_page($results) {
+
+  $summary['prefix']['#markup'] = '<div class="col-md-3"><h2>Result details</h2>';
+
+  $output['prefix']['#markup'] = '<div class="col-md-9"><ol class="search-results">';
+
+  foreach ($results as $entry) {
+    if ($entry['type'] == 'facets') {
+      // drupal_set_message(print_r($entry['extra'],1));
+      $facets = $entry['extra'];
+      foreach($facets as $type => $info) {
+        $items = array();
+        foreach ($info as $detail => $count) {
+          $items[] = "$detail $count";
+        }
+        $summary['facets'][] = array(
+          '#theme' => 'item_list',
+          '#items' => $items,
+          '#title' => $type
+        );
+      }
+    } else {
+      $output[] = array(
+        '#theme' => 'search_result',
+        '#result' => $entry,
+        '#module' => 'my_module_name',
+      );
+    }
+  }
+  $output['suffix']['#markup'] = '</ol>' . theme('pager') . '</div>';
+  $summary['suffix']['#markup'] = '</div>';
+
+  return array(
+    'prefix' => array('#markup' => '<div class="row">'),
+    'summary' => $summary,
+    'output' => $output,
+    'suffix' => array('#markup' => '</div>'),
+  );
 }
 
 function thalemine_search_theme() {
