@@ -57,7 +57,8 @@ function araport_download_file(){
     // "master" token configured for the Gateway DNA install.
     // https://jira.araport.org/browse/WSD-60
     // $token = agave_load_api_token($user);
-    $token = variable_get('agave_tenant_token', '');
+    // $accessToken = $token->getAccessToken();
+    $accessToken = variable_get('agave_tenant_token', '');
     // end master token edit
     $url = variable_get('agave_tenant_base_url', '') . '/files/v2/media/system/araport-public-files/' . implode('/', $args);
     $name = array_pop($args);
@@ -65,7 +66,7 @@ function araport_download_file(){
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_TIMEOUT, 5);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $token->getAccessToken()));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $accessToken);
     curl_setopt($ch, CURLOPT_SSLVERSION,3);
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_WRITEFUNCTION, '_araport_download_stream');
