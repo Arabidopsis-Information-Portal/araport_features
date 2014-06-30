@@ -28,7 +28,6 @@ function _thalemine_search_service_url($keys, $conditions, $facets = array()) {
 
 function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
   $facets = _thalemine_search_extract_facets();
-
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_TIMEOUT, 5);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -41,12 +40,9 @@ function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
   $response_json = curl_exec($ch);
   curl_close($ch);
   $response = json_decode($response_json);
-
   $results = array();
-
   if (count($response->results) > 0) {
     foreach($response->results as $result) {
-
       $results[] = array(
         'link' => 'https://apps.araport.org/thalemine/report.do?id='.$result->id,
         'type' => $result->type,
