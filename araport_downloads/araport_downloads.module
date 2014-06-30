@@ -89,18 +89,31 @@ function araport_downloads_view(){
     $path = $path . implode('/', func_get_args()) . '/';
   }
 
-  $client = agave_get_api_client();
+  // Waiting for the WORLD/GUEST user/role to be working.
+  // In the interim, instead of using the user's own token we'll use the
+  // "master" token configured for the Gateway DNA install.
+  // https://jira.araport.org/browse/WSD-60
+  // $client = agave_get_api_client();
+  $apiToken = variable_get('agave_tenant_token', '');
+  $apiServer = variable_get('agave_tenant_base_url', '');
+  $client = new APIClient($apiToken, $apiServer);
+  // end master token edit
   $listing = new AgaveFileListing($client, 'araport-public-files', $path);
-  return array(
-    'info' => array(
-      '#markup' => '<h3>Viewing <code>'.$path.'</code></h3>'
-    ),
-    'file_listing' => array(
-      '#theme' => 'araport_downloads_listing',
-      '#listing' => $listing->getList(),
-      '#open_directories' => TRUE
-    )
-  );
+  if ($list = $listing->getList()) {
+    return array(
+      'info' => array(
+        '#markup' => '<h3>Viewing <code>'.$path.'</code></h3>'
+      ),
+      'file_listing' => array(
+        '#theme' => 'araport_downloads_listing',
+        '#listing' => $list,
+        '#open_directories' => TRUE
+      )
+    );
+  } else {
+    drupal_set_message('An unexpected error occurred. We are unable to display datasets at this time.', 'error');
+    return '';
+  }
 }
 
 function araport_downloads_theme() {
@@ -125,7 +138,6 @@ function theme_araport_downloads_listing($variables) {
 
   $open_directories = $variables['open_directories'];
   $items = array();
-
   foreach ($listing as $item) {
     $render = array();
     if ($item->name == '.') {
@@ -135,7 +147,15 @@ function theme_araport_downloads_listing($variables) {
       $render['#theme'] = 'araport_downloads_directory';
       $render['#dir'] = $item;
       if ($open_directories) {
-        $client = agave_get_api_client();
+        // Waiting for the WORLD/GUEST user/role to be working.
+        // In the interim, instead of using the user's own token we'll use the
+        // "master" token configured for the Gateway DNA install.
+        // https://jira.araport.org/browse/WSD-60
+        // $client = agave_get_api_client();
+        $apiToken = variable_get('agave_tenant_token', '');
+        $apiServer = variable_get('agave_tenant_base_url', '');
+        $client = new APIClient($apiToken, $apiServer);
+        // end master token edit
         $dir_contents = new AgaveFileListing($client, 'araport-public-files', '/'.$item->path);
         $render = array(
           'dir' => $render,
