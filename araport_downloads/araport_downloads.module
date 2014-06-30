@@ -52,7 +52,13 @@ function araport_download_file(){
   global $user;
   $args = func_get_args();
   if (count($args)) {
-    $token = agave_load_api_token($user);
+    // Waiting for the WORLD/GUEST user/role to be working.
+    // In the interim, instead of using the user's own token we'll use the
+    // "master" token configured for the Gateway DNA install.
+    // https://jira.araport.org/browse/WSD-60
+    // $token = agave_load_api_token($user);
+    $token = variable_get('agave_tenant_token', '');
+    // end master token edit
     $url = variable_get('agave_tenant_base_url', '') . '/files/v2/media/system/araport-public-files/' . implode('/', $args);
     $name = array_pop($args);
 
