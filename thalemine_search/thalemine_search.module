@@ -74,7 +74,7 @@ function _thalemine_search_extract_facets() {
 }
 
 function thalemine_search_search_page($results) {
-  $pageUrl = substr($_REQUEST['q'], 1);
+  $pageUrl = request_path();
 
   $search_facets = _thalemine_search_extract_facets();
   $output = array();
