@@ -44,21 +44,23 @@ function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
 
   $results = array();
 
-  foreach($response->results as $result) {
+  if (count($response->results) > 0) {
+    foreach($response->results as $result) {
+
+      $results[] = array(
+        'link' => 'https://apps.araport.org/thalemine/report.do?id='.$result->id,
+        'type' => $result->type,
+        'title' => _thalemine_search_result_title($result),
+        'snippet' => theme('thalemine_search_result__'.strtolower($result->type), array('result' => $result))
+      );
+    }
 
     $results[] = array(
-      'link' => 'https://apps.araport.org/thalemine/report.do?id='.$result->id,
-      'type' => $result->type,
-      'title' => _thalemine_search_result_title($result),
-      'snippet' => theme('thalemine_search_result__'.strtolower($result->type), array('result' => $result))
+      'link' => '',
+      'type' => 'facets',
+      'extra' => $response->facets
     );
   }
-
-  $results[] = array(
-    'link' => '',
-    'type' => 'facets',
-    'extra' => $response->facets
-  );
 
   return $results;
 }
@@ -74,67 +76,74 @@ function _thalemine_search_extract_facets() {
 }
 
 function thalemine_search_search_page($results) {
-  $pageUrl = request_path();
-
-  $search_facets = _thalemine_search_extract_facets();
   $output = array();
-  if (count($search_facets) > 0) {
-    $output['facets'] = array(
-      '#prefix' => '<div class="well well-sm">',
-      '#suffix' => '</div>',
-      'info' => array(
-        '#markup' => '<p>Results filtered by:</p>'
-      ),
-      'list' => array(
-        '#theme' => 'item_list',
-        '#items' => array(),
-        '#title' => null
-      )
+  if (count($results) == 0) {
+    $contentSearch = 'search/node/' . arg(2);
+    $output['noresults'] = array(
+      '#markup' => '<h2>No results</h2><p>There were no results in Thalemine for your search term(s). Try searching '.l('Site Content', $contentSearch).' instead.</p>'
     );
-    foreach($search_facets as $f => $v) {
-      $unrefine = $search_facets;
-      unset($unrefine[$f]);
-      $output['facets']['list']['#items'][] = l('<i class="fa fa-minus-circle"></i> '.$f.': '.$v, $pageUrl, array('query' => $unrefine, 'html' => true, 'attributes'=> array('class'=> array('text-danger'))));
-    }
-  }
-
-  $summary['prefix']['#markup'] = '<div class="col-md-3"><h3>Refine results by:</h3>';
-
-  $content['prefix']['#markup'] = '<div class="col-md-9"><ol class="search-results">';
-
-  foreach ($results as $entry) {
-    if ($entry['type'] == 'facets') {
-      $facets = $entry['extra'];
-      foreach($facets as $type => $info) {
-        $items = array();
-        foreach ($info as $detail => $count) {
-          $refine = $search_facets;
-          $refine[$type] = $detail;
-          $items[] = l($detail. ' <span class="badge">'.$count.'</span>', $pageUrl, array('html' => true, 'query' => $refine));
-        }
-        $summary['facets'][] = array(
+  } else {
+    $pageUrl = request_path();
+    $search_facets = _thalemine_search_extract_facets();
+    if (count($search_facets) > 0) {
+      $output['facets'] = array(
+        '#prefix' => '<div class="well well-sm">',
+        '#suffix' => '</div>',
+        'info' => array(
+          '#markup' => '<p>Results filtered by:</p>'
+        ),
+        'list' => array(
           '#theme' => 'item_list',
-          '#items' => $items,
-          '#title' => $type
+          '#items' => array(),
+          '#title' => null
+        )
+      );
+      foreach($search_facets as $f => $v) {
+        $unrefine = $search_facets;
+        unset($unrefine[$f]);
+        $output['facets']['list']['#items'][] = l('<i class="fa fa-minus-circle"></i> '.$f.': '.$v, $pageUrl, array('query' => $unrefine, 'html' => true, 'attributes'=> array('class'=> array('text-danger'))));
+      }
+    }
+
+    $summary['prefix']['#markup'] = '<div class="col-md-3"><h3>Refine results by:</h3>';
+
+    $content['prefix']['#markup'] = '<div class="col-md-9"><ol class="search-results">';
+
+    foreach ($results as $entry) {
+      if ($entry['type'] == 'facets') {
+        $facets = $entry['extra'];
+        foreach($facets as $type => $info) {
+          $items = array();
+          foreach ($info as $detail => $count) {
+            $refine = $search_facets;
+            $refine[$type] = $detail;
+            $items[] = l($detail. ' <span class="badge">'.$count.'</span>', $pageUrl, array('html' => true, 'query' => $refine));
+          }
+          $summary['facets'][] = array(
+            '#theme' => 'item_list',
+            '#items' => $items,
+            '#title' => $type
+          );
+        }
+      } else {
+        $content[] = array(
+          '#theme' => 'search_result',
+          '#result' => $entry,
+          '#module' => 'my_module_name',
         );
       }
-    } else {
-      $content[] = array(
-        '#theme' => 'search_result',
-        '#result' => $entry,
-        '#module' => 'my_module_name',
-      );
     }
-  }
-  $content['suffix']['#markup'] = '</ol>' . theme('pager') . '</div>';
-  $summary['suffix']['#markup'] = '</div>';
+    $content['suffix']['#markup'] = '</ol>' . theme('pager') . '</div>';
+    $summary['suffix']['#markup'] = '</div>';
 
-  $output['results'] = array(
-    'prefix' => array('#markup' => '<div class="row">'),
-    'summary' => $summary,
-    'output' => $content,
-    'suffix' => array('#markup' => '</div>'),
-  );
+    $output['results'] = array(
+      'prefix' => array('#markup' => '<div class="row">'),
+      'summary' => $summary,
+      'output' => $content,
+      'suffix' => array('#markup' => '</div>'),
+    );
+  }
+
 
   return $output;
 }
