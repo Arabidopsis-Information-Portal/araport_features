@@ -180,9 +180,9 @@ function theme_araport_downloads_listing($variables) {
 }
 
 function theme_araport_downloads_directory($variables) {
-  return l('<i class="fa fa-folder"></i> ' . $variables['dir']->name, 'araport_downloads/' . $variables['dir']->path, array('html' => TRUE));
+  return l('<i class="fa fa-folder"></i> ' . $variables['dir']->name, 'downloads/' . $variables['dir']->path, array('html' => TRUE));
 }
 
 function theme_araport_downloads_file($variables) {
-  return l('<i class="fa fa-file"></i> ' . $variables['file']->name, 'araport_download_file/' . $variables['file']->path, array('html' => TRUE));
+  return l('<i class="fa fa-file"></i> ' . $variables['file']->name, 'download_file/' . $variables['file']->path, array('html' => TRUE));
 }
