@@ -7,11 +7,27 @@ function thalemine_search_search_info() {
   );
 }
 
-function _thalemine_search_service_url($keys, $conditions) {
-  return 'https://apps.araport.org/thalemine/service/search?q='.$keys;
+function thalemine_search_form_search_form_alter(&$form, &$form_state) {
+  if ($form['module']['#value'] == 'thalemine_search') {
+    $form['thalemine_search_description'] = array(
+      '#type' => 'markup',
+      '#prefix' => '<p class="help-block">',
+      '#suffix' => '</p>',
+      '#markup' => t('Search ThaleMine. Enter names, identifiers or keywords for genes, proteins, ontology terms, authors, etc. (e.g. FT, APL_ARATH, lateral root development, Somerville).')
+    );
+  }
+}
+
+function _thalemine_search_service_url($keys, $conditions, $facets = array()) {
+  $params = array('q='.$keys);
+  foreach ($facets as $facet => $value) {
+    $params[] = 'facet_'.$facet.'='.$value;
+  }
+  return 'https://apps.araport.org/thalemine/service/search?' . implode('&', $params);
 }
 
 function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
+  $facets = _thalemine_search_extract_facets();
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -21,7 +37,7 @@ function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
   /** TODO! https://jira.araport.org/browse/ADMIN-74 **/
   curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-  curl_setopt($ch, CURLOPT_URL, _thalemine_search_service_url($keys, $conditions));
+  curl_setopt($ch, CURLOPT_URL, _thalemine_search_service_url($keys, $conditions, $facets));
   $response_json = curl_exec($ch);
   curl_close($ch);
   $response = json_decode($response_json);
@@ -29,6 +45,7 @@ function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
   $results = array();
 
   foreach($response->results as $result) {
+
     $results[] = array(
       'link' => 'https://apps.araport.org/thalemine/report.do?id='.$result->id,
       'type' => $result->type,
@@ -46,20 +63,54 @@ function thalemine_search_search_execute($keys = NULL, $conditions = NULL) {
   return $results;
 }
 
+function _thalemine_search_extract_facets() {
+  $facets = array();
+  foreach ($_REQUEST as $key => $value) {
+    if ($key != 'q') {
+      $facets[$key] = $value;
+    }
+  }
+  return $facets;
+}
+
 function thalemine_search_search_page($results) {
+  $pageUrl = substr($_REQUEST['q'], 1);
 
-  $summary['prefix']['#markup'] = '<div class="col-md-3"><h2>Result details</h2>';
+  $search_facets = _thalemine_search_extract_facets();
+  $output = array();
+  if (count($search_facets) > 0) {
+    $output['facets'] = array(
+      '#prefix' => '<div class="well well-sm">',
+      '#suffix' => '</div>',
+      'info' => array(
+        '#markup' => '<p>Results filtered by:</p>'
+      ),
+      'list' => array(
+        '#theme' => 'item_list',
+        '#items' => array(),
+        '#title' => null
+      )
+    );
+    foreach($search_facets as $f => $v) {
+      $unrefine = $search_facets;
+      unset($unrefine[$f]);
+      $output['facets']['list']['#items'][] = l('<i class="fa fa-minus-circle"></i> '.$f.': '.$v, $pageUrl, array('query' => $unrefine, 'html' => true, 'attributes'=> array('class'=> array('text-danger'))));
+    }
+  }
 
-  $output['prefix']['#markup'] = '<div class="col-md-9"><ol class="search-results">';
+  $summary['prefix']['#markup'] = '<div class="col-md-3"><h3>Refine results by:</h3>';
+
+  $content['prefix']['#markup'] = '<div class="col-md-9"><ol class="search-results">';
 
   foreach ($results as $entry) {
     if ($entry['type'] == 'facets') {
-      // drupal_set_message(print_r($entry['extra'],1));
       $facets = $entry['extra'];
       foreach($facets as $type => $info) {
         $items = array();
         foreach ($info as $detail => $count) {
-          $items[] = "$detail $count";
+          $refine = $search_facets;
+          $refine[$type] = $detail;
+          $items[] = l($detail. ' <span class="badge">'.$count.'</span>', $pageUrl, array('html' => true, 'query' => $refine));
         }
         $summary['facets'][] = array(
           '#theme' => 'item_list',
@@ -68,22 +119,24 @@ function thalemine_search_search_page($results) {
         );
       }
     } else {
-      $output[] = array(
+      $content[] = array(
         '#theme' => 'search_result',
         '#result' => $entry,
         '#module' => 'my_module_name',
       );
     }
   }
-  $output['suffix']['#markup'] = '</ol>' . theme('pager') . '</div>';
+  $content['suffix']['#markup'] = '</ol>' . theme('pager') . '</div>';
   $summary['suffix']['#markup'] = '</div>';
 
-  return array(
+  $output['results'] = array(
     'prefix' => array('#markup' => '<div class="row">'),
     'summary' => $summary,
-    'output' => $output,
+    'output' => $content,
     'suffix' => array('#markup' => '</div>'),
   );
+
+  return $output;
 }
 
 function thalemine_search_theme() {
