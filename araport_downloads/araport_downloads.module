@@ -6,7 +6,7 @@
 function araport_downloads_menu(){
   $items = array();
 
-  $items['araport_downloads'] = array(
+  $items['downloads'] = array(
     'title' => 'Downloads',
     'description' => '',
     'type' => MENU_NORMAL_ITEM,
@@ -14,7 +14,7 @@ function araport_downloads_menu(){
     'access arguments' => array('access araport datasets')
   );
 
-  $items['araport_download_file'] = array(
+  $items['download_file'] = array(
     'title' => 'Downloads',
     'description' => '',
     'type' => MENU_CALLBACK,
