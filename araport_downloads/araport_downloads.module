@@ -19,7 +19,7 @@ function araport_downloads_menu(){
     'description' => '',
     'type' => MENU_CALLBACK,
     'page callback' => 'araport_download_file',
-    'access arguments' => array('access araport datasets')
+    'access arguments' => array('download araport datasets')
   );
 
   return $items;
@@ -32,8 +32,13 @@ function araport_downloads_permission(){
   $perms = array();
 
   $perms['access araport datasets'] = array(
-    'title' => 'Access & download hosted datasets',
-    'description' => 'Users with this permission can browse and download publicly hosted AIP datasets.',
+    'title' => 'Browse hosted datasets',
+    'description' => 'Users with this permission can browse publicly hosted AIP datasets.',
+  );
+
+  $perms['download araport datasets'] = array(
+    'title' => 'Download hosted datasets',
+    'description' => 'Users with this permission can download publicly hosted AIP datasets.',
   );
 
   return $perms;
@@ -82,28 +87,46 @@ function araport_download_file(){
   }
 }
 
+function araport_downloads_get_token() {
+  global $user;
+  if ($user->uid) {
+    // Waiting for the WORLD/GUEST user/role to be working.
+    // In the interim, instead of using the user's own token we'll use the
+    // "master" token configured for the Gateway DNA install.
+    // https://jira.araport.org/browse/WSD-60
+    // $token = agave_load_api_token($user);
+    // return $token->getAccessToken();
+    return variable_get('agave_tenant_token', '');
+  } else {
+    // use master token to allow browsing
+    return variable_get('agave_tenant_token', '');
+  }
+}
+
 function araport_downloads_view(){
 
   $path = '/';
   $args = func_get_args();
   if (count($args)) {
-    $path = $path . implode('/', func_get_args()) . '/';
+    $path = $path . implode('/', $args);
   }
 
-  // Waiting for the WORLD/GUEST user/role to be working.
-  // In the interim, instead of using the user's own token we'll use the
-  // "master" token configured for the Gateway DNA install.
-  // https://jira.araport.org/browse/WSD-60
-  // $client = agave_get_api_client();
-  $apiToken = variable_get('agave_tenant_token', '');
+  $apiToken = araport_downloads_get_token();
   $apiServer = variable_get('agave_tenant_base_url', '');
   $client = new APIClient($apiToken, $apiServer);
-  // end master token edit
   $listing = new AgaveFileListing($client, 'araport-public-files', $path);
   if ($list = $listing->getList()) {
+    $breadcrumbs = array();
+    $crumb = '';
+    $breadcrumbs[] = l('$ROOT', 'downloads');
+    foreach ($args as $arg) {
+      $crumb .= '/' . $arg;
+      $breadcrumbs[] = l($arg, 'downloads'.$crumb);
+    }
+
     return array(
       'info' => array(
-        '#markup' => '<h3>Viewing <code>'.$path.'</code></h3>'
+        '#markup' => '<ol class="breadcrumb"><li>'.implode('</li><li>', $breadcrumbs).'</li></ol>'
       ),
       'file_listing' => array(
         '#theme' => 'araport_downloads_listing',
@@ -148,15 +171,9 @@ function theme_araport_downloads_listing($variables) {
       $render['#theme'] = 'araport_downloads_directory';
       $render['#dir'] = $item;
       if ($open_directories) {
-        // Waiting for the WORLD/GUEST user/role to be working.
-        // In the interim, instead of using the user's own token we'll use the
-        // "master" token configured for the Gateway DNA install.
-        // https://jira.araport.org/browse/WSD-60
-        // $client = agave_get_api_client();
-        $apiToken = variable_get('agave_tenant_token', '');
+        $apiToken = araport_downloads_get_token();
         $apiServer = variable_get('agave_tenant_base_url', '');
         $client = new APIClient($apiToken, $apiServer);
-        // end master token edit
         $dir_contents = new AgaveFileListing($client, 'araport-public-files', '/'.$item->path);
         $render = array(
           'dir' => $render,
@@ -185,5 +202,12 @@ function theme_araport_downloads_directory($variables) {
 }
 
 function theme_araport_downloads_file($variables) {
-  return l('<i class="fa fa-file"></i> ' . $variables['file']->name, 'download_file/' . $variables['file']->path, array('html' => TRUE));
+  global $user;
+  if (user_access('download araport datasets')) {
+    $output = l('<i class="fa fa-file"></i> ' . $variables['file']->name, 'download_file/' . $variables['file']->path, array('html' => TRUE));
+  } else {
+    $output = '<i class="fa fa-file"></i> ' . $variables['file']->name;
+    $output .= ' (' . l('Login to download', 'user/login', array('query' => array('destination' => 'downloads/' . $variables['file']->path))) . ')';
+  }
+  return $output;
 }
