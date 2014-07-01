@@ -124,8 +124,12 @@ function araport_downloads_view(){
       $breadcrumbs[] = l($arg, 'downloads'.$crumb);
     }
 
+
     return array(
       'info' => array(
+        '#markup' => '<p class="lead">Hosted files and datasets available for download.</p>'
+      ),
+      'fsnav' => array(
         '#markup' => '<ol class="breadcrumb"><li>'.implode('</li><li>', $breadcrumbs).'</li></ol>'
       ),
       'file_listing' => array(
