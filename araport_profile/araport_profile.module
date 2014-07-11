@@ -6,11 +6,29 @@
 
 include_once 'araport_profile.features.inc';
 
+function araport_profile_form_user_register_form_alter(&$form, &$form_state){
+  // users can set password at registration
+  if (!variable_get('user_email_verification', TRUE)) {
+    // TODO display password requirements
+    // TODO add validation handler
+  }
+}
 
 function araport_profile_form_user_profile_form_alter(&$form, &$form_state) {
   if ($form['#user_category'] === 'account') {
     $weight = $form['account']['name']['#weight'];
     $form['account']['mail']['#weight'] = $weight - 1; // make email appear above username
+
+    if (! $form['account']['name']['#access']) {
+      // diplay username, but disabled
+      $form['account']['_name'] = $form['account']['name'];
+      $form['account']['_name']['#disabled'] = TRUE;
+      $form['account']['_name']['#description'] = '';
+      unset($form['account']['_name']['#access']);
+    }
+
+    $prev_description = $form['account']['pass']['#description'];
+    $form['account']['pass']['#description'] = $prev_description . '<br>' . t('Passwords must be a minimum of 5 characters in length and cannot contain your username or any part of your username. You may not reuse any of your previous 5 passwords.');
   }
 }
 
