@@ -7,4 +7,4 @@ dependencies[] = agave_files
 
 stylesheets[all][] = araport_downloads.css
 
-scripts[] = araport_downloads.js
+;scripts[] = araport_downloads.js
