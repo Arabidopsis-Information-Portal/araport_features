@@ -205,13 +205,22 @@ function theme_araport_downloads_directory($variables) {
   return l('<i class="fa fa-folder"></i> ' . $variables['dir']->name, 'downloads/' . $variables['dir']->path, array('html' => TRUE));
 }
 
+function _araport_downloads_human_filesize($bytes, $decimals = 2) {
+  $size   = array('bytes','kB','MB','GB','TB','PB','EB','ZB','YB');
+  $factor = floor((strlen($bytes) - 1) / 3);
+
+  return sprintf("%.{$decimals}f", $bytes/pow(1024, $factor)).' '.@$size[$factor];
+}
+
 function theme_araport_downloads_file($variables) {
   global $user;
+  $file = $variables['file'];
   if (user_access('download araport datasets')) {
-    $output = l('<i class="fa fa-file"></i> ' . $variables['file']->name, 'download_file/' . $variables['file']->path, array('html' => TRUE));
+    $output = l('<i class="fa fa-file"></i> ' . $file->name, 'download_file/' . $file->path, array('html' => TRUE));
   } else {
-    $output = '<i class="fa fa-file"></i> ' . $variables['file']->name;
-    $output .= ' (' . l('Login to download', 'user/login', array('query' => array('destination' => 'downloads/' . $variables['file']->path))) . ')';
+    $output = '<i class="fa fa-file"></i> ' . $file->name;
+    $output .= ' (' . l('Login to download', 'user/login', array('query' => array('destination' => 'downloads/' . $file->path))) . ')';
   }
-  return $output;
+  $size = '<small class="text-muted">'._araport_downloads_human_filesize($file->length).'</small>';
+  return $output.' '.$size;
 }
