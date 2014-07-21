@@ -44,7 +44,7 @@ community/jobs/*',
         'weight' => 0,
       ),
     ),
-    'title' => '',
+    'title' => 'Post a Job',
     'visibility' => 1,
   );
 
