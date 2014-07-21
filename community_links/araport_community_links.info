@@ -17,6 +17,7 @@ features[ctools][] = strongarm:strongarm:1
 features[ctools][] = views:views_default:3.0
 features[fe_block_boxes][] = post_community_link
 features[fe_block_settings][] = block-post_community_link
+features[fe_block_settings][] = views-aip_links-block_1
 features[features_api][] = api:2
 features[field_base][] = field_links_workflow
 features[field_base][] = field_url

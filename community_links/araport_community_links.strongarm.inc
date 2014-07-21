@@ -80,17 +80,17 @@ function araport_community_links_strongarm() {
       'search_result' => array(
         'custom_settings' => FALSE,
       ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+      'workflow_tab' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '0',
-        ),
-        'path' => array(
-          'weight' => '4',
-        ),
-        'redirect' => array(
-          'weight' => '3',
+          'weight' => '-5',
         ),
       ),
       'display' => array(),
