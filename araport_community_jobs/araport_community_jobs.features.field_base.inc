@@ -98,6 +98,33 @@ function araport_community_jobs_field_default_field_bases() {
     'type' => 'text_long',
   );
 
+  // Exported field_base: 'field_job_filled'
+  $field_bases['field_job_filled'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_job_filled',
+    'foreign keys' => array(),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => '',
+        1 => '',
+      ),
+      'allowed_values_function' => '',
+      'profile2_private' => FALSE,
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
+  );
+
   // Exported field_base: 'field_workflow'
   $field_bases['field_workflow'] = array(
     'active' => 1,
@@ -116,8 +143,8 @@ function araport_community_jobs_field_default_field_bases() {
     'settings' => array(
       'allowed_values_function' => 'workflowfield_allowed_values',
       'allowed_values_string' => '1 | (creation)
-3 | Submitted
-2 | Approve',
+2 | Submitted
+3 | Approve',
       'history' => array(
         'history_tab_show' => 1,
         'roles' => array(

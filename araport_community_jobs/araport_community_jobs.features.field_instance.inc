@@ -55,7 +55,7 @@ function araport_community_jobs_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -100,13 +100,13 @@ function araport_community_jobs_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 4,
       ),
     ),
     'entity_type' => 'node',
@@ -140,13 +140,13 @@ function araport_community_jobs_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'node',
@@ -168,6 +168,48 @@ function araport_community_jobs_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-job_posting-field_job_filled'
+  $field_instances['node-job_posting-field_job_filled'] = array(
+    'bundle' => 'job_posting',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'If the job has been filled since posting, check this box to mark the posting as "filled" and archive the posting.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_job_filled',
+    'label' => 'Job has been filled',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 4,
+    ),
+  );
+
   // Exported field_instance: 'node-job_posting-field_workflow'
   $field_instances['node-job_posting-field_workflow'] = array(
     'bundle' => 'job_posting',
@@ -179,13 +221,13 @@ function araport_community_jobs_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 1,
       ),
     ),
     'entity_type' => 'node',
@@ -203,7 +245,7 @@ function araport_community_jobs_field_default_field_instances() {
         'name_as_title' => 1,
       ),
       'type' => 'workflow_default',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -213,6 +255,8 @@ function araport_community_jobs_field_default_field_instances() {
   t('Description');
   t('Hiring Institution');
   t('How to apply');
+  t('If the job has been filled since posting, check this box to mark the posting as "filled" and archive the posting.');
+  t('Job has been filled');
   t('Provide instructions for applications, e.g., a URL, email address, or phone number.');
   t('Workflow');
 

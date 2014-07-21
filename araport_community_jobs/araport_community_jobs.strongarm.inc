@@ -100,7 +100,10 @@ function araport_community_jobs_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '4',
+          'weight' => '5',
+        ),
+        'path' => array(
+          'weight' => '7',
         ),
       ),
       'display' => array(),
@@ -126,7 +129,9 @@ function araport_community_jobs_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_options_job_posting';
-  $strongarm->value = array();
+  $strongarm->value = array(
+    0 => 'status',
+  );
   $export['node_options_job_posting'] = $strongarm;
 
   $strongarm = new stdClass();

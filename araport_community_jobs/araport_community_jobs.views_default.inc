@@ -43,7 +43,7 @@ function araport_community_jobs_views_default_views() {
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = '<div class="jumbotron">
-<h2>No jobs posted!</h2>
+<h2>No jobs currently posted!</h2>
 <p>
 <?php if (user_access(\'create job_posting content\')) { ?>
 Are you hiring? <?php print l(\'Post a job now!\', \'node/add/job-posting\'); ?>
@@ -109,6 +109,45 @@ Looking for a job? Please check back again as more job postings become available
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'job_posting' => 'job_posting',
+  );
+  /* Filter criterion: Workflow current: Current state */
+  $handler->display->display_options['filters']['sid']['id'] = 'sid';
+  $handler->display->display_options['filters']['sid']['table'] = 'workflow_node_current';
+  $handler->display->display_options['filters']['sid']['field'] = 'sid';
+  $handler->display->display_options['filters']['sid']['value'] = array(
+    3 => '3',
+  );
+  $handler->display->display_options['filters']['sid']['expose']['workflow_reduce_wid'] = FALSE;
+  /* Filter criterion: Content: Job has been filled (field_job_filled) */
+  $handler->display->display_options['filters']['field_job_filled_value']['id'] = 'field_job_filled_value';
+  $handler->display->display_options['filters']['field_job_filled_value']['table'] = 'field_data_field_job_filled';
+  $handler->display->display_options['filters']['field_job_filled_value']['field'] = 'field_job_filled_value';
+  $handler->display->display_options['filters']['field_job_filled_value']['value'] = array(
+    0 => '0',
+  );
+  /* Filter criterion: Content: Post date */
+  $handler->display->display_options['filters']['created']['id'] = 'created';
+  $handler->display->display_options['filters']['created']['table'] = 'node';
+  $handler->display->display_options['filters']['created']['field'] = 'created';
+  $handler->display->display_options['filters']['created']['operator'] = 'between';
+  $handler->display->display_options['filters']['created']['value']['min'] = 'now -3 months';
+  $handler->display->display_options['filters']['created']['value']['max'] = 'now';
+  $handler->display->display_options['filters']['created']['value']['type'] = 'offset';
   $handler->display->display_options['path'] = 'community/jobs';
   $handler->display->display_options['menu']['title'] = 'Job Postings';
   $handler->display->display_options['menu']['weight'] = '0';
