@@ -19,7 +19,7 @@ function thalemine_search_form_search_form_alter(&$form, &$form_state) {
 }
 
 function _thalemine_search_service_url($keys, $conditions, $facets = array()) {
-  $params = array('q='.$keys);
+  $params = array('q='.urlencode($keys));
   foreach ($facets as $facet => $value) {
     $params[] = 'facet_'.$facet.'='.$value;
   }
