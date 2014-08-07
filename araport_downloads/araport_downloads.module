@@ -105,6 +105,8 @@ function araport_downloads_get_token() {
 
 function araport_downloads_view(){
 
+  drupal_add_js(drupal_get_path('module','araport_downloads').'/araport_downloads.js');
+
   $path = '/';
   $args = func_get_args();
   if (count($args)) {
@@ -202,7 +204,8 @@ function theme_araport_downloads_listing($variables) {
 }
 
 function theme_araport_downloads_directory($variables) {
-  return l('<i class="fa fa-folder"></i> ' . $variables['dir']->name, 'downloads/' . $variables['dir']->path, array('html' => TRUE));
+  $path = ltrim($variables['dir']->path, '/');
+  return l('<i class="fa fa-folder"></i> ' . $variables['dir']->name, 'downloads/' . $path, array('html' => TRUE));
 }
 
 function _araport_downloads_human_filesize($bytes, $decimals = 2) {
@@ -215,11 +218,18 @@ function _araport_downloads_human_filesize($bytes, $decimals = 2) {
 function theme_araport_downloads_file($variables) {
   global $user;
   $file = $variables['file'];
+  $path = ltrim($file->path, '/');
   if (user_access('download araport datasets')) {
-    $output = l('<i class="fa fa-file"></i> ' . $file->name, 'download_file/' . $file->path, array('html' => TRUE));
+
+    // build cURL command for data-araport-curl attribute
+    $token = agave_load_api_token($user);
+    $accessToken = $token->getAccessToken();
+    $curl_cmd = "curl -sO -H 'Authorization: Bearer $accessToken' ".$file->_links->self->href;
+
+    $output = l('<i class="fa fa-file"></i> ' . $file->name, 'download_file/' . $path, array('html' => TRUE, 'attributes' => array('data-araport-curl' => $curl_cmd)));
   } else {
     $output = '<i class="fa fa-file"></i> ' . $file->name;
-    $output .= ' (' . l('Login to download', 'user/login', array('query' => array('destination' => 'downloads/' . $file->path))) . ')';
+    $output .= ' (' . l('Login to download', 'user/login', array('query' => array('destination' => 'downloads/' . $path))) . ')';
   }
   $size = '<small class="text-muted">'._araport_downloads_human_filesize($file->length).'</small>';
   return $output.' '.$size;
