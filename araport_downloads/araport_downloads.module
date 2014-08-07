@@ -57,14 +57,7 @@ function araport_download_file(){
   global $user;
   $args = func_get_args();
   if (count($args)) {
-    // Waiting for the WORLD/GUEST user/role to be working.
-    // In the interim, instead of using the user's own token we'll use the
-    // "master" token configured for the Gateway DNA install.
-    // https://jira.araport.org/browse/WSD-60
-    // $token = agave_load_api_token($user);
-    // $accessToken = $token->getAccessToken();
-    $accessToken = variable_get('agave_tenant_token', '');
-    // end master token edit
+    $accessToken = araport_downloads_get_token();
     $url = variable_get('agave_tenant_base_url', '') . '/files/v2/media/system/araport-public-files/' . implode('/', $args);
     $name = array_pop($args);
 
@@ -90,13 +83,14 @@ function araport_download_file(){
 function araport_downloads_get_token() {
   global $user;
   if ($user->uid) {
-    // Waiting for the WORLD/GUEST user/role to be working.
+    // Waiting for the world/GUEST user/role to be working.
     // In the interim, instead of using the user's own token we'll use the
     // "master" token configured for the Gateway DNA install.
     // https://jira.araport.org/browse/WSD-60
-    // $token = agave_load_api_token($user);
-    // return $token->getAccessToken();
-    return variable_get('agave_tenant_token', '');
+    // return variable_get('agave_tenant_token', '');
+
+    $token = agave_load_api_token($user);
+    return $token->getAccessToken();
   } else {
     // use master token to allow browsing
     return variable_get('agave_tenant_token', '');
@@ -222,8 +216,7 @@ function theme_araport_downloads_file($variables) {
   if (user_access('download araport datasets')) {
 
     // build cURL command for data-araport-curl attribute
-    $token = agave_load_api_token($user);
-    $accessToken = $token->getAccessToken();
+    $accessToken = araport_downloads_get_token();
     $curl_cmd = "curl -sO -H 'Authorization: Bearer $accessToken' ".$file->_links->self->href;
 
     $output = l('<i class="fa fa-file"></i> ' . $file->name, 'download_file/' . $path, array('html' => TRUE, 'attributes' => array('data-araport-curl' => $curl_cmd)));
