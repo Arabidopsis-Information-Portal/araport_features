@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Araport Syndication feature.
+ */
+
+include_once 'araport_syndication.features.inc';
