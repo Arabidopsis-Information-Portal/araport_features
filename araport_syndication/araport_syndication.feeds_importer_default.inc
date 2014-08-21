@@ -65,13 +65,18 @@ function araport_syndication_feeds_importer_default() {
           ),
           5 => array(
             'source' => 'url',
-            'target' => 'url',
+            'target' => 'field_syndicated_url',
             'unique' => FALSE,
           ),
           6 => array(
+            'source' => 'url',
+            'target' => 'url',
+            'unique' => 1,
+          ),
+          7 => array(
             'source' => 'guid',
             'target' => 'guid',
-            'unique' => FALSE,
+            'unique' => 1,
           ),
         ),
         'update_existing' => '2',
