@@ -1,0 +1,181 @@
+<?php
+
+function jbrowse_search_search_info() {
+  return array(
+    'title' => 'JBrowse',
+    'path' => 'jbrowse'
+  );
+}
+
+function jbrowse_search_form_search_form_alter(&$form, &$form_state) {
+  if ($form['module']['#value'] == 'jbrowse_search') {
+    $form['jbrowse_search_description'] = array(
+      '#type' => 'markup',
+      '#prefix' => '<p class="help-block">',
+      '#suffix' => '</p>',
+      '#markup' => t('Search JBrowse. Enter gene or mrna identifiers or gene symbols (e.g. AT1G01010, AT1G24929.1, mir166, grf11).')
+    );
+  }
+}
+
+function _jbrowse_search_service_url($keys, $conditions, $facets = array()) {
+  $params = array('startswith='.urlencode($keys));
+  
+  return 'https://apps.araport.org/thalemine/service/jbrowse/names/3702?' . implode('&', $params);
+}
+
+function jbrowse_search_search_execute($keys = NULL, $conditions = NULL) {
+  $facets = _jbrowse_search_extract_facets();
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_SSLVERSION,3);
+
+  /** TODO! https://jira.araport.org/browse/ADMIN-74 **/
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($ch, CURLOPT_URL, _jbrowse_search_service_url($keys, $conditions, $facets));
+  $response_json = curl_exec($ch);
+  curl_close($ch);
+  $response = json_decode($response_json);
+  $results = array();
+  
+  if (count($response) > 0) {
+
+    for ($i = 0; $i < count($response); ++$i) {
+
+        $loc = $response[$i]->location->ref . '%3A' . $response[$i]->location->start . '...' . $response[$i]->location->end;
+
+	if($response[$i]->location->tracks[1] == "Gene") {
+    	  $results[ ] = array(
+	   'link' => 'https://apps.araport.org/jbrowse/?data=arabidopsis&tracks=TAIR10_genome%2CTAIR10_genes%2CMAKER_EST_FLcDNA_est2genome%2CMAKER_protein2genome&loc=' . $loc,
+	   'type' => $response[$i]->location->tracks[1],
+	   'title' => $response[$i]->location->objectName,
+	   'loc' => $loc,
+	   'name' => $response[$i]->name
+	  );
+	}
+	
+    }
+
+    $results[] = array(
+      'link' => '',
+      'type' => 'facets'
+    );
+  }
+
+  return $results;
+}
+
+function _jbrowse_search_extract_facets() {
+  $facets = array();
+  foreach ($_REQUEST as $key => $value) {
+    if ($key != 'q') {
+      $facets[$key] = $value;
+    }
+  }
+  return $facets;
+}
+
+function jbrowse_search_search_page($results) {
+  $output = array();
+  if (count($results) == 0) {
+    $contentSearch = 'search/node/' . arg(2);
+    $output['noresults'] = array(
+      '#markup' => '<h2>No results</h2><p>There were no results in Jbrowse for your search term(s). Try searching '.l('Site Content', $contentSearch).' instead.</p>'
+    );
+  } else {
+    $pageUrl = request_path();
+    $search_facets = _jbrowse_search_extract_facets();
+    if (count($search_facets) > 0) {
+      $output['facets'] = array(
+        'list' => array(
+          '#theme' => 'item_list',
+          '#items' => array(),
+          '#title' => null
+        )
+      );
+
+    }
+
+
+    $content['prefix']['#markup'] = '<div class="col-md-9"><ol class="search-results">';
+
+    foreach ($results as $entry) {
+      if ($entry['type'] == 'facets') {
+
+      } else {
+        $content[] = array(
+          '#theme' => 'search_result',
+          '#result' => $entry,
+          '#module' => 'my_module_name',
+        );
+      }
+    }
+    $content['suffix']['#markup'] = '</ol>' . theme('pager') . '</div>';
+    $summary['suffix']['#markup'] = '</div>';
+
+    $output['results'] = array(
+      'prefix' => array('#markup' => '<div class="row">'),
+      'summary' => $summary,
+      'output' => $content,
+      'suffix' => array('#markup' => '</div>'),
+    );
+  }
+
+
+  return $output;
+}
+
+function jbrowse_search_theme() {
+  return array(
+    'jbrowse_search_result' => array(
+      'pattern' => 'jbrowse_search_result__',
+      'variables' => array(
+        'result' => NULL
+      )
+    )
+  );
+}
+
+function _jbrowse_search_result_title($result) {
+  switch($result) {
+    case 'Gene':
+    case 'MRNA':
+    case 'Protein':
+      return $result->fields->primaryIdentifier;
+    case 'Publication':
+      return $result->fields->title;
+    case 'Author':
+    case 'Lab':
+    case 'InteractionTerm':
+    case 'GOTerm':
+    case 'SOTerm':
+    case 'Sample':
+    case 'OntologyTerm':
+      return $result->fields->name;
+    case 'Synonym':
+      return $result->fields->value;
+    default:
+      // just return first object key
+      return $title;
+  }
+}
+
+function _jbrowse_search_nice_field_name($field_name) {
+  return ucfirst(preg_replace('/[.]/', ' ', preg_replace_callback('/([A-Z])/', function($matches) {
+    return ' '.strtolower($matches[0]);
+  }, $field_name)));
+}
+
+function theme_jbrowse_search_result($variables) {
+  $result = $variables['result'];
+  $output = '<dl class="dl-horizontal">';
+  $output .= '<dt>Result type</dt><dd><i class="fa fa-tag"></i> ' . $result->type . '</dd>';
+  foreach ($result->fields as $name => $value) {
+    $nice_name = _jbrowse_search_nice_field_name($name);
+    $output .= '<dt>'.$nice_name.'</dt>';
+    $output .= '<dd>'.$value.'</dd>';
+  }
+  $output .= '</dl>';
+  return $output;
+}

@@ -1,0 +1,8 @@
+name = JBrowse Search
+description = Search integration for various AIP JBrowse.
+package = Araport
+version = 7.x-1.0
+core = 7.x
+
+
+stylesheets[all][] = jbrowse_search.css
