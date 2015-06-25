@@ -75,7 +75,7 @@ function new_homepage_06242015_default_panels_mini() {
     $pane->configuration = array(
       'admin_title' => 'All Search Examples',
       'title' => '',
-      'body' => '<p>&nbsp;Search Thalemine, JBrowse, other content<br /><i class="fa fa-1x fa-arrow-circle-up"></i>&nbsp;Search by identifiers or keywords e.g. AT4G19020 or epigenetic</p>',
+      'body' => '<p>&nbsp;Search Thalemine, JBrowse and other site content<br />&nbsp;<i class="fa fa-pencil-square-o"></i>&nbsp;Search by identifiers or keywords e.g. AT4G19020 or epigenetic</p>',
       'format' => 'full_html',
       'substitute' => TRUE,
     );
@@ -150,7 +150,7 @@ function new_homepage_06242015_default_panels_mini() {
 </form>
 
 <div class="Search-Examples">
-<p>&nbsp;Search JBrowse core tracks.<br /><i class="fa fa-1x fa-arrow-circle-up"></i>&nbsp;Search by identifiers or keywords e.g. LFY or AT5G61850 or floral meristem</p>
+<p>&nbsp;Search JBrowse core tracks.<br />&nbsp;<i class="fa fa-pencil-square-o"></i>&nbsp;Search by locus identifiers or gene symbols e.g. AT5G61850 or LFY or GRF11</p>
 </div>',
       'format' => 'full_html',
       'substitute' => TRUE,
@@ -332,7 +332,7 @@ function new_homepage_06242015_default_panels_mini() {
 </form>
 
 <div class="Search-Examples">
-<p>&nbsp;Search Thalemine database.<br /><i class="fa fa-1x fa-arrow-circle-up"></i>&nbsp;Search by identifiers or keywords e.g. AT3G24650 or FT or lateral root development</p>
+<p>&nbsp;Search Thalemine database.<br />&nbsp;<i class="fa fa-pencil-square-o"></i>&nbsp;Search by identifiers or keywords e.g. AT3G24650 or FT or lateral root development</p>
 </div>',
       'format' => 'full_html',
       'substitute' => TRUE,

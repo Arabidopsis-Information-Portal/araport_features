@@ -324,8 +324,8 @@ function new_homepage_06242015_default_page_manager_pages() {
       'admin_title' => 'Featured Topic',
       'title' => '',
       'body' => '<div class="featured-topic">
-<a href="arabidopsis-firsts-table"><h2>Featured Topic: Arabidopsis Firsts</h2></a>
-<p>This topic captures responses to the question posed to the Newsgroup last month: "What are some seminal contributions to plant biology and to science in general coming first from Arabidopsis?" Comments and additions are welcome. Please&nbsp;<a class="comment-button" href="user/register">REGISTER&nbsp;<i class="fa fa-pencil-square"></a>&nbsp;or&nbsp;<a class="comment-button" href="user/login">LOGIN&nbsp;<i class="fa fa-lock"></a> to post comments.</p>
+<h2><a href="arabidopsis-firsts-table"><i class="fa fa-star-o"></i>&nbsp;Featured Topic: Arabidopsis Firsts</h2></a>
+<p>This topic captures responses to the question posed to the Newsgroup last month: "What are some seminal contributions to plant biology and to science in general coming first from Arabidopsis?" Comments and additions are welcome. Please&nbsp;<a class="comment-button" href="user/register">REGISTER&nbsp;<i class="fa fa-pencil-square"></i></a>&nbsp;or&nbsp;<a class="comment-button" href="user/login">LOGIN&nbsp;<i class="fa fa-lock"></i></a> to post comments.</p>
 
 </div>',
       'format' => 'full_html',
@@ -387,7 +387,7 @@ function new_homepage_06242015_default_page_manager_pages() {
     $pane->configuration = array(
       'admin_title' => 'Front More Linkout',
       'title' => '',
-      'body' => '<a class="registration-button" href="arabidopsis-firsts-table">VIEW MORE&nbsp;<i class="fa fa-forumbee"></a>
+      'body' => '<a class="registration-button" href="arabidopsis-firsts-table">VIEW MORE&nbsp;<i class="fa fa-forumbee"></i></a>
 ',
       'format' => 'full_html',
       'substitute' => TRUE,
@@ -602,7 +602,7 @@ function new_homepage_06242015_default_page_manager_pages() {
 
 <div class="top-box4-block" onclick="window.open(\'welcome-blast\')" style="cursor: pointer;"></div>
 
-<div class="top-box-desc" onclick="window.open(\'welcome-blast\')" style="cursor: pointer;"><p>Click to align your sequence to the Col-0 genome.</p></div>',
+<div class="top-box-desc" onclick="window.open(\'welcome-blast\')" style="cursor: pointer;"><p>Click to search against Col-0 data and other plant proteomes.</p></div>',
       'format' => 'full_html',
       'substitute' => TRUE,
     );
@@ -687,7 +687,7 @@ function new_homepage_06242015_default_page_manager_pages() {
 <p>Araport is a one-stop-shop for <em>Arabidopsis thaliana</em> genomics. Araport offers gene and protein reports with orthology, expression, interactions and the latest annotation, plus analysis tools, community apps, and web services. Araport is 100% free and open-source. Registered members can save their analysis, publish science apps, and post announcements. <a class="right-side-readmore" href="about">READ MORE&nbsp;<i class="fa fa-dedent "></p>
 
 <div class="frontpage-registration-buttons">
-<a class="registration-button" href="user/register">REGISTER&nbsp;<i class="fa fa-pencil-square"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="registration-button" href="user/login">LOGIN&nbsp;<i class="fa fa-lock"></a>
+<a class="registration-button" href="user/register">REGISTER&nbsp;<i class="fa fa-pencil-square"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="registration-button" href="user/login">LOGIN&nbsp;<i class="fa fa-lock"></i></a>
 </div>
 </div>',
       'format' => 'full_html',
