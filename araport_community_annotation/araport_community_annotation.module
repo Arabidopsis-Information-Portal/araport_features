@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Araport Community Annotation feature.
+ */
+
+include_once 'araport_community_annotation.features.inc';
