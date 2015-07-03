@@ -10,6 +10,7 @@ Module Name | Module Description
 araport_preview2 | Functionality and configuration from the Preview 2 release of AIP
 araport_profile | AIP User Profile module/customization
 araport_community_jobs | Enables members to submit job postings for advertisement on AIP
+araport_community_annotation | Enables members to be involved in the Community Curation process of the Araport11 annotation
 araport_downloads | AIP publicly hosted downloads. This is a custom wrapper around Agave/Files API.
 thalemine_search | Search Thalemine via Thalemine API
 community_links | Add community web links

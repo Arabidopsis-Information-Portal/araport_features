@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the New Homepage 06242015 feature.
+ */
+
+include_once 'new_homepage_06242015.features.inc';
