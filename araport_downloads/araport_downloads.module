@@ -57,16 +57,23 @@ function araport_download_file(){
   global $user;
   $args = func_get_args();
   if (count($args)) {
-    // Waiting for the WORLD/GUEST user/role to be working.
-    // In the interim, instead of using the user's own token we'll use the
-    // "master" token configured for the Gateway DNA install.
-    // https://jira.araport.org/browse/WSD-60
-    // $token = agave_load_api_token($user);
-    // $accessToken = $token->getAccessToken();
-    $accessToken = variable_get('agave_tenant_token', '');
-    // end master token edit
-    $url = variable_get('agave_tenant_base_url', '') . '/files/v2/media/system/araport-public-files/' . implode('/', $args);
+    $path = implode('/', $args);
     $name = array_pop($args);
+    $accessToken = araport_downloads_get_token();
+
+    // get content-type
+    $url = variable_get('agave_tenant_base_url', '') . '/files/v2/listings/system/araport-public-files/' . $path;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $accessToken));
+    curl_setopt($ch, CURLOPT_URL, $url);
+    $response = json_decode(curl_exec($ch));
+    curl_close($ch);
+    $contentType = $response->result[0]->mimeType;
+
+    // download
+    $url = variable_get('agave_tenant_base_url', '') . '/files/v2/media/system/araport-public-files/' . $path;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -76,7 +83,7 @@ function araport_download_file(){
     curl_setopt($ch, CURLOPT_WRITEFUNCTION, '_araport_download_stream');
 
     drupal_add_http_header('Content-disposition', 'attachment; filename='.$name);
-
+    drupal_add_http_header('Content-type', $contentType);
     curl_exec($ch);
     curl_close($ch);
     drupal_exit();
@@ -89,13 +96,8 @@ function araport_download_file(){
 function araport_downloads_get_token() {
   global $user;
   if ($user->uid) {
-    // Waiting for the WORLD/GUEST user/role to be working.
-    // In the interim, instead of using the user's own token we'll use the
-    // "master" token configured for the Gateway DNA install.
-    // https://jira.araport.org/browse/WSD-60
-    // $token = agave_load_api_token($user);
-    // return $token->getAccessToken();
-    return variable_get('agave_tenant_token', '');
+    $token = agave_load_api_token($user);
+    return $token->getAccessToken();
   } else {
     // use master token to allow browsing
     return variable_get('agave_tenant_token', '');
