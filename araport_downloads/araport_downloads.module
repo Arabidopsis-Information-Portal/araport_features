@@ -96,8 +96,9 @@ function araport_download_file(){
 function araport_downloads_get_token() {
   global $user;
   if ($user->uid) {
-    $token = agave_load_api_token($user);
-    return $token->getAccessToken();
+    // $token = agave_load_api_token($user);
+    // return $token->getAccessToken();
+    return variable_get('agave_tenant_token', '');
   } else {
     // use master token to allow browsing
     return variable_get('agave_tenant_token', '');
