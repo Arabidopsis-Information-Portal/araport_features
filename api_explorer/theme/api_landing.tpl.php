@@ -30,6 +30,71 @@
    <?php print $app_content ?>
    <!-- end apps -->
 </div>
+<link href='/sites/all/libraries/swagger-ui-2.1.0/dist/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
+<style>
+  .swagger-section .swagger-ui-wrap {
+    max-width: inherit;
+  }
+  .swagger-section #resources {
+    padding: 0;
+  }
+  .swagger-section #message-bar {
+    min-height: 0;
+    padding: 0;
+    text-align: inherit;
+  }
+  .swagger-section #message-bar a {
+    color: inherit;
+  }
+  .loading:before {
+    content: "Loading Community Data APIs...";
+    font-size: 2em;
+    display: block;
+    text-align: center;
+    margin: 1em 0;
+  }
+  @media(min-width:768px) {
+    .service-description {
+      height: 4.3em;
+      overflow: hidden;
+      position: relative;
+    }
+    .service-description:after {
+      position: absolute;
+      content: '';
+      display: block;
+      width: 100%;
+      height: 1.5em;
+      bottom: 0;
+      background-image: linear-gradient(to bottom, rgba(255,255,255,0), white);
+    }
+  }
+  #community-data-service-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.1);
+    z-index: 10000;
+  }
+  #community-data-service-wrapper {
+    background-color: #fff;
+    border: 1px solid #333;
+    box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    width: 90%;
+    margin: 100px auto;
+    padding: 20px;
+    min-height: 100px;
+  }
+  .service .tags {
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .service .img-wrapper {
+    height: 80px;
+  }
+</style>
 
 <script src="/sites/all/libraries/es6-promise/promise.min.js" type="text/javascript"></script>
 <script>

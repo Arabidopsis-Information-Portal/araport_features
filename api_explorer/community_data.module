@@ -27,9 +27,11 @@ function get_all_services(){
     if ($cache = cache_get('api_browser_all_services')) {
       $all_services = $cache->data;
     } else {
-    $ns_arry = get_namespaces()["result"];
+    $ns_arry = get_namespaces();
+    $ns_arry = $ns_arry["result"];
     foreach ($ns_arry as $value) {
-      $service_arry = get_services_for_namespace($value["name"])["result"];
+      $service_arry = get_services_for_namespace($value["name"]);
+      $service_arry = $service_arry["result"];
       if(!empty($service_arry)){
         foreach ($service_arry as $serviceObj) {
           $base64Img = getImg($serviceObj);
@@ -96,31 +98,3 @@ function get_namespaces(){
     }
     return $base64;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
