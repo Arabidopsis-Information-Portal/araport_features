@@ -1,3 +1,0 @@
-name = Community Data in API Explorer
-description = Renders Community Data in API explorer page by pulling data on the server-side
-core = 7.x

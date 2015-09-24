@@ -1,0 +1,5 @@
+name = Araport API Explorer
+description = Web service console/explorer for Araport APIs including ADAMA Community Data APIs, the Agave API, and the Thalemine API.
+package = Araport
+core = 7.x
+version = VERSION
