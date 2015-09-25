@@ -70,7 +70,7 @@
       '<p class="tags">', serviceTags(srv), '</p>',
       '<p class="service-description">', (srv.description || ''), '</p><p class="text-center">',
       '<button class="btn btn-default btn-xs" name="more-service">More Information</button> ',
-      '<button class="btn btn-primary btn-xs" name="try-service">Try this service</button>',
+      '<button class="btn btn-primary btn-xs" name="try-service">' + (Agave.token ? 'Try this service' : 'Log in to try') + '</button>',
       '</p></div></div></div>'
     ].join('');
   };

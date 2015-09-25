@@ -1,0 +1,17 @@
+.swagger-section .swagger-ui-wrap {
+  max-width: inherit;
+}
+.swagger-section .container {
+  width: auto;
+}
+.swagger-section #resources {
+  padding: 0;
+}
+.swagger-section #message-bar {
+  min-height: 0;
+  padding: 0;
+  text-align: inherit;
+}
+.swagger-section #message-bar a {
+  color: inherit;
+}

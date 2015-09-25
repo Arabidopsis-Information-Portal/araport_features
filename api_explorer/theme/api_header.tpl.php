@@ -1,3 +1,6 @@
+<?php if ($anonymous): ?>
+   <div class="alert alert-warning">Please <a href="/user/login?destination=api-explorer/community-data">log in</a> to interact with the API Console.</div>
+<?php endif; ?>
 <form>
    <div class="row">
       <div class="col-md-6">

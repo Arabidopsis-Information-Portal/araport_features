@@ -34,7 +34,7 @@
       ?>
       <p class="text-center">
         <button class="btn btn-default btn-xs" name="more-service">More Information</button>
-        <button class="btn btn-primary btn-xs" name="try-service"><?php if ($user_logged_in) { ?>Try this service<?php } else { ?>Log in to try this service<?php } ?></button></p>
+        <button class="btn btn-primary btn-xs" name="try-service"><?php if ($user_logged_in) { ?>Try this service<?php } else { ?>Log in to try<?php } ?></button></p>
       </p>
     </div>
   </div>

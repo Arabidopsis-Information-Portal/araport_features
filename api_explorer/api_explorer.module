@@ -47,7 +47,9 @@ function api_explorer_theme() {
     'api_explorer_community_data_page_header' => array(
       'template' => 'api_header',
       'path' => $template_path,
-      'variables' => array(),
+      'variables' => array(
+        'anonymous' => TRUE,
+      ),
     ),
 
     'api_explorer_community_data_service' => array(
@@ -67,9 +69,11 @@ function api_explorer_theme() {
 }
 
 function api_explorer_community_data() {
+  global $user;
   $output = array(
     'header' => array(
-      '#theme' => 'api_explorer_community_data_page_header'
+      '#theme' => 'api_explorer_community_data_page_header',
+      '#anonymous' => ($user->uid == 0),
     ),
     'services' => array(
       '#prefix' => '<div id="services" class="row">',
@@ -92,10 +96,11 @@ function api_explorer_community_data() {
     );
   }
 
-  drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/community-data.css');
   drupal_add_css(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/css/screen.css');
+  drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/swagger-overrides.css');
+  drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/community-data.css');
 
-drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/moment/min/moment.min.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/moment/min/moment.min.js', array('scope' => 'footer'));
   drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/es6-promise/promise.min.js', array('scope' => 'footer'));
   drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/promise-polyfill.js', array('scope' => 'footer'));
   drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.slideto.min.js', array('scope' => 'footer'));
@@ -115,14 +120,42 @@ drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/moment/min/mome
 
 function api_explorer_agave_api() {
   // TODO
-  $output = array();
+  $markup = <<<HTML
+<link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
+<div class="swagger-section">
+  <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
+  <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
+</div>
+HTML;
+
+  $output = array(
+    '#markup' => $markup,
+  );
+
+  drupal_add_css(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/css/screen.css');
+  drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/swagger-overrides.css');
+
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/es6-promise/promise.min.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/promise-polyfill.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.slideto.min.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.wiggle.min.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.ba-bbq.min.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/handlebars-2.0.0.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/underscore-min.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/backbone-min.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/swagger-ui.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/highlight.7.3.pack.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/marked.js', array('scope' => 'footer'));
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/agave-api.js', array('scope' => 'footer'));
+
   return $output;
 }
 
 function api_explorer_thalemine_api() {
-  // TODO
-  $output = array();
-  return $output;
+  drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/thalemine-api.js', array('scope' => 'footer'));
+  return array(
+    '#markup' => '<div id="thalemine-api"></div>',
+  );
 }
 
 // function community_data_page_build(&$page) {
