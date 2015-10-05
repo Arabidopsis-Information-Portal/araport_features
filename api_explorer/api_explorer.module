@@ -80,8 +80,7 @@ function api_explorer_community_data() {
       '#suffix' => '</div>',
     ),
   );
-  $all_services = api_explorer_get_all_services();
-  // watchdog('api_explorer', print_r($all_services, 1));
+  $all_services = cache_graceful('api_explorer_community_data', array('api_explorer_get_all_services'), 'cache', 150, 30);
   foreach ($all_services as $serviceObj) {
     $key = $serviceObj['name'] . $serviceObj['version'];
     $output['services'][$key] = array(
@@ -158,64 +157,34 @@ function api_explorer_thalemine_api() {
   );
 }
 
-// function community_data_page_build(&$page) {
-//   if (current_path() == 'api-explorer') {
-//     $app_template_path = drupal_get_path('module', 'community_data'). '/theme/api_app.tpl.php';
-//     $app_content = "";
-//     $all_services = api_explorer_get_all_services();
-//     foreach ($all_services as $serviceObj) {
-//           $app_content = $app_content . theme_render_template($app_template_path, $serviceObj);
-//     }
-
-//      $clean_json = str_replace("'","\'",json_encode($all_services));
-//      $api_content = array('app_content' => $app_content, 'services' => $clean_json);
-
-//      $template_path = drupal_get_path('module', 'community_data'). '/theme/api_landing.tpl.php';
-//      $api_browser_content = theme_render_template($template_path, $api_content);
-
-//     $page ['content']['disclaimer'] = array(
-//       '#markup' => t($api_browser_content),
-//       '#weight' => 25,
-//     );
-//   }
-// }
-
-function api_explorer_get_all_services(){
+function api_explorer_get_all_services() {
     $all_services = array();
-    if ($cache = cache_get('api_browser_all_services')) {
-      $all_services = $cache->data;
-    } else {
-      $ns_arry = api_explorer_get_namespaces();
-      $ns_arry = $ns_arry["result"];
-      foreach ($ns_arry as $value) {
-        $service_arry = api_explorer_get_services_for_namespace($value["name"]);
-        $service_arry = $service_arry["result"];
-        if(!empty($service_arry)){
-          foreach ($service_arry as $serviceObj) {
-            $base64Img = api_explorer_service_get_img($serviceObj);
-            $serviceObj['icon'] = $base64Img;
-            array_push($all_services, $serviceObj);
-          }
+    $ns_arry = api_explorer_get_namespaces();
+    $ns_arry = $ns_arry["result"];
+    foreach ($ns_arry as $value) {
+      $service_arry = api_explorer_get_services_for_namespace($value["name"]);
+      $service_arry = $service_arry["result"];
+      if(!empty($service_arry)){
+        foreach ($service_arry as $serviceObj) {
+          $base64Img = api_explorer_service_get_img($serviceObj);
+          $serviceObj['icon'] = $base64Img;
+          array_push($all_services, $serviceObj);
         }
       }
-
-      usort($all_services, 'api_explorer_sort_name_version');
-      cache_set('api_browser_all_services', $all_services, 'cache', time() + 120);
     }
+    usort($all_services, 'api_explorer_sort_name_version');
     return $all_services;
 }
 
 
 function api_explorer_get_namespaces(){
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/namespaces');
     $token = variable_get('agave_tenant_token', '');
 
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/namespaces');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
     $resp = curl_exec($ch);
-
     $json_obj = json_decode($resp, true);
     usort($json_obj['result'], 'api_explorer_sort_name');
     return $json_obj;
@@ -230,33 +199,29 @@ function api_explorer_get_namespaces(){
   }
 
   function api_explorer_get_services_for_namespace($service_name){
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/' . $service_name . '/services?');
     $token = variable_get('agave_tenant_token', '');
 
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/' . $service_name . '/services?');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
     $resp = curl_exec($ch);
     $json_obj = json_decode($resp, true);
-
     return $json_obj;
   }
 
   function api_explorer_service_get_img($srv){
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $srv['self'] . '/icon');
-
-
     $token = variable_get('agave_tenant_token', '');
 
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $srv['self'] . '/icon');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
     $resp = curl_exec($ch);
+
     $http_status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     if($http_status_code == 200){
-    $base64 = base64_encode($resp);
+      $base64 = base64_encode($resp);
     } else {
       $base64 = null;
     }

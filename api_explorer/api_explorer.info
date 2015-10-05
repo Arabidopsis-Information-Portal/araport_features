@@ -3,3 +3,6 @@ description = Web service console/explorer for Araport APIs including ADAMA Comm
 package = Araport
 core = 7.x
 version = VERSION
+
+dependencies[] = agave
+dependencies[] = cache_graceful
