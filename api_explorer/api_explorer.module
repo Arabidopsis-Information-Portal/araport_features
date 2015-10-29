@@ -96,6 +96,8 @@ function api_explorer_community_data() {
         '#description' => $serviceObj['description'],
       );
     }
+  } else {
+    $all_services = array();
   }
 
   drupal_add_css(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/css/screen.css');
