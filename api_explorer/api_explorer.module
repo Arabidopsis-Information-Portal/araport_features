@@ -227,3 +227,8 @@ function api_explorer_get_namespaces(){
     }
     return $base64;
   }
+
+  function api_explorer_cron() {
+    // keep api_explorer info up to date
+    cache_graceful('api_explorer_community_data', array('api_explorer_get_all_services'), 'cache', 150, 30);
+  }
