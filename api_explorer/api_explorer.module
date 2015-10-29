@@ -80,19 +80,22 @@ function api_explorer_community_data() {
       '#suffix' => '</div>',
     ),
   );
-  $all_services = cache_graceful('api_explorer_community_data', array('api_explorer_get_all_services'), 'cache', 150, 30);
-  foreach ($all_services as $serviceObj) {
-    $key = $serviceObj['name'] . $serviceObj['version'];
-    $output['services'][$key] = array(
-      '#theme' => 'api_explorer_community_data_service',
-      '#service' => $serviceObj,
-      '#name' => $serviceObj['name'],
-      '#version' => $serviceObj['version'],
-      '#namespace' => $serviceObj['namespace'],
-      '#icon' => $serviceObj['icon'],
-      '#tags' => $serviceObj['tags'],
-      '#description' => $serviceObj['description'],
-    );
+  $cache = cache_get('api_explorer_community_data');
+  if ($cache && ! empty($cache->data)) {
+    $all_services = $cache->data;
+    foreach ($all_services as $serviceObj) {
+      $key = $serviceObj['name'] . $serviceObj['version'];
+      $output['services'][$key] = array(
+        '#theme' => 'api_explorer_community_data_service',
+        '#service' => $serviceObj,
+        '#name' => $serviceObj['name'],
+        '#version' => $serviceObj['version'],
+        '#namespace' => $serviceObj['namespace'],
+        '#icon' => $serviceObj['icon'],
+        '#tags' => $serviceObj['tags'],
+        '#description' => $serviceObj['description'],
+      );
+    }
   }
 
   drupal_add_css(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/css/screen.css');
@@ -157,7 +160,8 @@ function api_explorer_thalemine_api() {
   );
 }
 
-function api_explorer_get_all_services() {
+function api_explorer_update_all_services() {
+    watchdog('api_explorer', 'executing api_explorer_update_all_services task');
     $all_services = array();
     $ns_arry = api_explorer_get_namespaces();
     $ns_arry = $ns_arry["result"];
@@ -173,62 +177,77 @@ function api_explorer_get_all_services() {
       }
     }
     usort($all_services, 'api_explorer_sort_name_version');
+    cache_set('api_explorer_community_data', $all_services);
     return $all_services;
 }
 
 
 function api_explorer_get_namespaces(){
-    $token = variable_get('agave_tenant_token', '');
+  $token = variable_get('agave_tenant_token', '');
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/namespaces');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $resp = curl_exec($ch);
-    $json_obj = json_decode($resp, true);
-    usort($json_obj['result'], 'api_explorer_sort_name');
-    return $json_obj;
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/namespaces');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $resp = curl_exec($ch);
+  $json_obj = json_decode($resp, true);
+  usort($json_obj['result'], 'api_explorer_sort_name');
+  return $json_obj;
+}
+
+function api_explorer_sort_name($a, $b){
+  return strcmp($a['name'],$b['name']);
+}
+
+function api_explorer_sort_name_version($a,$b){
+  return strcmp($a['name'] . '_v' . $a['version'], $b['name'] . '_v' . $b['version']);
+}
+
+function api_explorer_get_services_for_namespace($service_name){
+  $token = variable_get('agave_tenant_token', '');
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/' . $service_name . '/services?');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $resp = curl_exec($ch);
+  $json_obj = json_decode($resp, true);
+  return $json_obj;
+}
+
+function api_explorer_service_get_img($srv){
+  $token = variable_get('agave_tenant_token', '');
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $srv['self'] . '/icon');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $resp = curl_exec($ch);
+
+  $http_status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  if($http_status_code == 200){
+    $base64 = base64_encode($resp);
+  } else {
+    $base64 = null;
   }
+  return $base64;
+}
 
-  function api_explorer_sort_name($a, $b){
-    return strcmp($a['name'],$b['name']);
-  }
+function api_explorer_cron() {
+  $queue = DrupalQueue::get('update_api_explorer_community_data');
+  $queue->createItem(array());
+}
 
-  function api_explorer_sort_name_version($a,$b){
-    return strcmp($a['name'] . '_v' . $a['version'], $b['name'] . '_v' . $b['version']);
-  }
-
-  function api_explorer_get_services_for_namespace($service_name){
-    $token = variable_get('agave_tenant_token', '');
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/' . $service_name . '/services?');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $resp = curl_exec($ch);
-    $json_obj = json_decode($resp, true);
-    return $json_obj;
-  }
-
-  function api_explorer_service_get_img($srv){
-    $token = variable_get('agave_tenant_token', '');
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $srv['self'] . '/icon');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $resp = curl_exec($ch);
-
-    $http_status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if($http_status_code == 200){
-      $base64 = base64_encode($resp);
-    } else {
-      $base64 = null;
-    }
-    return $base64;
-  }
-
-  function api_explorer_cron() {
-    // keep api_explorer info up to date
-    cache_graceful('api_explorer_community_data', array('api_explorer_get_all_services'), 'cache', 150, 30);
-  }
+/**
+ *
+ * Implements hook_cron_queue_info
+ */
+function api_explorer_cron_queue_info() {
+  // keep api_explorer info up to date
+  return array(
+    'update_api_explorer_community_data' => array(
+      'worker callback' => 'api_explorer_update_all_services',
+      'time' => 120,
+    ),
+  );
+}
