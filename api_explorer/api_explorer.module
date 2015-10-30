@@ -83,21 +83,23 @@ function api_explorer_community_data() {
   $cache = cache_get('api_explorer_community_data');
   if ($cache && ! empty($cache->data)) {
     $all_services = $cache->data;
-    foreach ($all_services as $serviceObj) {
-      $key = $serviceObj['name'] . $serviceObj['version'];
-      $output['services'][$key] = array(
-        '#theme' => 'api_explorer_community_data_service',
-        '#service' => $serviceObj,
-        '#name' => $serviceObj['name'],
-        '#version' => $serviceObj['version'],
-        '#namespace' => $serviceObj['namespace'],
-        '#icon' => $serviceObj['icon'],
-        '#tags' => $serviceObj['tags'],
-        '#description' => $serviceObj['description'],
-      );
-    }
   } else {
-    $all_services = array();
+    // The cache was probably recently cleared; manually call
+    // to get the services and update the cache
+    $all_services = api_explorer_update_all_services();
+  }
+  foreach ($all_services as $serviceObj) {
+    $key = $serviceObj['name'] . $serviceObj['version'];
+    $output['services'][$key] = array(
+      '#theme' => 'api_explorer_community_data_service',
+      '#service' => $serviceObj,
+      '#name' => $serviceObj['name'],
+      '#version' => $serviceObj['version'],
+      '#namespace' => $serviceObj['namespace'],
+      '#icon' => $serviceObj['icon'],
+      '#tags' => $serviceObj['tags'],
+      '#description' => $serviceObj['description'],
+    );
   }
 
   drupal_add_css(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/css/screen.css');
@@ -163,24 +165,24 @@ function api_explorer_thalemine_api() {
 }
 
 function api_explorer_update_all_services() {
-    watchdog('api_explorer', 'executing api_explorer_update_all_services task');
-    $all_services = array();
-    $ns_arry = api_explorer_get_namespaces();
-    $ns_arry = $ns_arry["result"];
-    foreach ($ns_arry as $value) {
-      $service_arry = api_explorer_get_services_for_namespace($value["name"]);
-      $service_arry = $service_arry["result"];
-      if(!empty($service_arry)){
-        foreach ($service_arry as $serviceObj) {
-          $base64Img = api_explorer_service_get_img($serviceObj);
-          $serviceObj['icon'] = $base64Img;
-          array_push($all_services, $serviceObj);
-        }
+  watchdog('api_explorer', 'executing api_explorer_update_all_services task');
+  $all_services = array();
+  $ns_arry = api_explorer_get_namespaces();
+  $ns_arry = $ns_arry["result"];
+  foreach ($ns_arry as $value) {
+    $service_arry = api_explorer_get_services_for_namespace($value["name"]);
+    $service_arry = $service_arry["result"];
+    if(!empty($service_arry)){
+      foreach ($service_arry as $serviceObj) {
+        $base64Img = api_explorer_service_get_img($serviceObj);
+        $serviceObj['icon'] = $base64Img;
+        array_push($all_services, $serviceObj);
       }
     }
-    usort($all_services, 'api_explorer_sort_name_version');
-    cache_set('api_explorer_community_data', $all_services);
-    return $all_services;
+  }
+  usort($all_services, 'api_explorer_sort_name_version');
+  cache_set('api_explorer_community_data', $all_services);
+  return $all_services;
 }
 
 
