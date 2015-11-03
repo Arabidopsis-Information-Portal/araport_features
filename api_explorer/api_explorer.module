@@ -88,7 +88,7 @@ function api_explorer_community_data() {
     // to get the services and update the cache
     $all_services = api_explorer_update_all_services();
   }
-  foreach ($all_services as $serviceObj) {
+  foreach ($all_services as &$serviceObj) {
     $key = $serviceObj['name'] . $serviceObj['version'];
     if (! is_array($serviceObj['tags'])) {
       $serviceObj['tags'] = explode(',', $serviceObj['tags']);
