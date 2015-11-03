@@ -189,7 +189,12 @@
         });
       }
       _.each(renderSet, function(s) {
-        $mainEl.append(templateService(s));
+        try {
+          $mainEl.append(templateService(s));
+        } catch (e) {
+          console.log(e);
+          console.log(s);
+        }
       });
       resolve(true);
     });
