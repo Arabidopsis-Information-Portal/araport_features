@@ -90,6 +90,9 @@ function api_explorer_community_data() {
   }
   foreach ($all_services as $serviceObj) {
     $key = $serviceObj['name'] . $serviceObj['version'];
+    if (! is_array($serviceObj['tags'])) {
+      $serviceObj['tags'] = explode(',', $serviceObj['tags']);
+    }
     $output['services'][$key] = array(
       '#theme' => 'api_explorer_community_data_service',
       '#service' => $serviceObj,
