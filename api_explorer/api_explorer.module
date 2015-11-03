@@ -59,7 +59,7 @@ function api_explorer_theme() {
         'version' => '',
         'namespace' => '',
         'icon' => '',
-        'tags' => '',
+        'tags' => array(),
         'description' => '',
       ),
       'template' => 'api_app',
