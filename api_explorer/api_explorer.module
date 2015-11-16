@@ -88,41 +88,52 @@ function api_explorer_community_data() {
     // to get the services and update the cache
     $all_services = api_explorer_update_all_services();
   }
-  foreach ($all_services as &$serviceObj) {
-    $key = $serviceObj['namespace'] . $serviceObj['name'] . $serviceObj['version'];
-    if (! is_array($serviceObj['tags'])) {
-      $serviceObj['tags'] = explode(',', $serviceObj['tags']);
+
+  if ($all_services && count($all_services) > 0) {
+    foreach ($all_services as &$serviceObj) {
+      $key = $serviceObj['namespace'] . $serviceObj['name'] . $serviceObj['version'];
+      if (! is_array($serviceObj['tags'])) {
+        $serviceObj['tags'] = explode(',', $serviceObj['tags']);
+      }
+      $output['services'][$key] = array(
+        '#theme' => 'api_explorer_community_data_service',
+        '#service' => $serviceObj,
+        '#name' => $serviceObj['name'],
+        '#version' => $serviceObj['version'],
+        '#namespace' => $serviceObj['namespace'],
+        '#icon' => $serviceObj['icon'],
+        '#tags' => $serviceObj['tags'],
+        '#description' => $serviceObj['description'],
+      );
     }
-    $output['services'][$key] = array(
-      '#theme' => 'api_explorer_community_data_service',
-      '#service' => $serviceObj,
-      '#name' => $serviceObj['name'],
-      '#version' => $serviceObj['version'],
-      '#namespace' => $serviceObj['namespace'],
-      '#icon' => $serviceObj['icon'],
-      '#tags' => $serviceObj['tags'],
-      '#description' => $serviceObj['description'],
+
+    drupal_add_css(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/css/screen.css');
+    drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/swagger-overrides.css');
+    drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/community-data.css');
+
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/moment/min/moment.min.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/es6-promise/promise.min.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/promise-polyfill.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.slideto.min.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.wiggle.min.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.ba-bbq.min.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/handlebars-2.0.0.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/underscore-min.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/backbone-min.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/swagger-ui.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/highlight.7.3.pack.js', array('scope' => 'footer'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/marked.js', array('scope' => 'footer'));
+    drupal_add_js('window.services = '.json_encode($all_services).';', array('scope' => 'footer', 'type' => 'inline'));
+    drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/community-data.js', array('scope' => 'footer'));
+  } else {
+    $message_h = t('Community Data APIs Temporarily Unavailable');
+    $message_b = t('The Araport Community Data APIs are temporarily unavailable. We apologize for this inconvenience.');
+    $output['services'] = array(
+      '#prefix' => '<div class="alert alert-warning">',
+      '#suffix' => '</div>',
+      '#markup' => "<h4>$message_h</h4><p>$message_b</p>",
     );
   }
-
-  drupal_add_css(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/css/screen.css');
-  drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/swagger-overrides.css');
-  drupal_add_css(drupal_get_path('module', 'api_explorer').'/styles/community-data.css');
-
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/moment/min/moment.min.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/es6-promise/promise.min.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/promise-polyfill.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.slideto.min.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.wiggle.min.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/jquery.ba-bbq.min.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/handlebars-2.0.0.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/underscore-min.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/backbone-min.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/swagger-ui.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/highlight.7.3.pack.js', array('scope' => 'footer'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/vendor/swagger-ui-2.1.0/dist/lib/marked.js', array('scope' => 'footer'));
-  drupal_add_js('window.services = '.json_encode($all_services).';', array('scope' => 'footer', 'type' => 'inline'));
-  drupal_add_js(drupal_get_path('module', 'api_explorer').'/scripts/community-data.js', array('scope' => 'footer'));
 
   return $output;
 }
@@ -169,23 +180,42 @@ function api_explorer_thalemine_api() {
 
 function api_explorer_update_all_services() {
   watchdog('api_explorer', 'executing api_explorer_update_all_services task');
-  $all_services = array();
-  $ns_arry = api_explorer_get_namespaces();
-  $ns_arry = $ns_arry["result"];
-  foreach ($ns_arry as $value) {
-    $service_arry = api_explorer_get_services_for_namespace($value["name"]);
-    $service_arry = $service_arry["result"];
-    if(!empty($service_arry)){
-      foreach ($service_arry as $serviceObj) {
-        $base64Img = api_explorer_service_get_img($serviceObj);
-        $serviceObj['icon'] = $base64Img;
-        array_push($all_services, $serviceObj);
+  $cached = cache_get('api_explorer_community_data');
+  if ($cached) {
+    $cached_services = $cached->data;
+  } else {
+    $cached_services = array();
+  }
+
+  try {
+    $ns_arry = api_explorer_get_namespaces();
+    $ns_arry = $ns_arry["result"];
+
+    $all_services = array();
+    foreach ($ns_arry as $value) {
+      try {
+        $service_arry = api_explorer_get_services_for_namespace($value["name"]);
+        $service_arry = $service_arry["result"];
+        if(!empty($service_arry)){
+          foreach ($service_arry as $serviceObj) {
+            $base64Img = api_explorer_service_get_img($serviceObj);
+            $serviceObj['icon'] = $base64Img;
+            array_push($all_services, $serviceObj);
+          }
+        }
+      } catch (Exception $e) {
+        watchdog('api_explorer', 'Failed to updated cached services for namespace: @reason',
+              array('@reason' => $e->getMessage()), WATCHDOG_ERROR);
       }
     }
+    usort($all_services, 'api_explorer_sort_name_version');
+    $cached_services = $all_services;
+  } catch (Exception $e) {
+    watchdog('api_explorer', 'Failed to updated cached services: @reason',
+              array('@reason' => $e->getMessage()), WATCHDOG_ERROR);
   }
-  usort($all_services, 'api_explorer_sort_name_version');
-  cache_set('api_explorer_community_data', $all_services);
-  return $all_services;
+  cache_set('api_explorer_community_data', $cached_services);
+  return $cached_services;
 }
 
 
@@ -197,9 +227,16 @@ function api_explorer_get_namespaces(){
   curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $resp = curl_exec($ch);
+  $info = curl_getinfo($ch);
+  curl_close($ch);
+
   $json_obj = json_decode($resp, true);
-  usort($json_obj['result'], 'api_explorer_sort_name');
-  return $json_obj;
+  if ($json_obj['status'] && $json_obj['status'] == 'success') {
+    usort($json_obj['result'], 'api_explorer_sort_name');
+    return $json_obj;
+  } else {
+    throw new Exception('Call to Adama#getNamespaces failed', $info['http_code']);
+  }
 }
 
 function api_explorer_sort_name($a, $b){
@@ -212,16 +249,23 @@ function api_explorer_sort_name_version($a, $b){
   return strcmp($a_key, $b_key);
 }
 
-function api_explorer_get_services_for_namespace($service_name){
+function api_explorer_get_services_for_namespace($namespace) {
   $token = variable_get('agave_tenant_token', '');
 
   $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://api.araport.org/community/v0.3/' . $service_name . '/services?');
+  curl_setopt($ch, CURLOPT_URL, "https://api.araport.org/community/v0.3/$namespace/services?");
   curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $resp = curl_exec($ch);
+  $info = curl_getinfo($ch);
+  curl_close($ch);
+
   $json_obj = json_decode($resp, true);
-  return $json_obj;
+  if ($json_obj['status'] && $json_obj['status'] == 'success') {
+    return $json_obj;
+  } else {
+    throw new Exception("Call to Adama#getServices for namespace=$namespace failed", $info['http_code']);
+  }
 }
 
 function api_explorer_service_get_img($srv){
@@ -232,8 +276,9 @@ function api_explorer_service_get_img($srv){
   curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer $token"));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $resp = curl_exec($ch);
-
   $http_status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+
   if($http_status_code == 200){
     $base64 = base64_encode($resp);
   } else {
@@ -242,6 +287,10 @@ function api_explorer_service_get_img($srv){
   return $base64;
 }
 
+/**
+ *
+ * Implements hook_cron()
+ */
 function api_explorer_cron() {
   $queue = DrupalQueue::get('update_api_explorer_community_data');
   $queue->createItem(array());
@@ -249,7 +298,7 @@ function api_explorer_cron() {
 
 /**
  *
- * Implements hook_cron_queue_info
+ * Implements hook_cron_queue_info()
  */
 function api_explorer_cron_queue_info() {
   // keep api_explorer info up to date
