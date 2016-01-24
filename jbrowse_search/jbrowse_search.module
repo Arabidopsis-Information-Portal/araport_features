@@ -39,19 +39,20 @@ function jbrowse_search_search_execute($keys = NULL, $conditions = NULL) {
   $response = json_decode($response_json);
   $results = array();
 
+  $jbrowse_url = 'https://apps.araport.org/jbrowse/?data=arabidopsis';
   if (count($response) > 0) {
 
     for ($i = 0; $i < count($response); ++$i) {
 
-        $loc = $response[$i]->location->ref . '%3A' . $response[$i]->location->start . '...' . $response[$i]->location->end;
+        $loc = $response[$i]->location->ref . ':' . $response[$i]->location->start . '..' . $response[$i]->location->end;
 
-	if($response[$i]->location->tracks[1] == "Gene") {
+   $type = "Gene";
+	if(in_array($type, $response[$i]->location->tracks)) {
     	  $results[ ] = array(
-	   'link' => 'https://apps.araport.org/jbrowse/?data=arabidopsis&tracks=TAIR10_genome%2CTAIR10_genes%2CMAKER_EST_FLcDNA_est2genome%2CMAKER_protein2genome&loc=' . $loc,
-	   'type' => $response[$i]->location->tracks[1],
+	   'link' => $jbrowse_url.'&loc=' . $loc,
+	   'type' => $type,
 	   'title' => $response[$i]->location->objectName,
-	   'loc' => $loc,
-	   'name' => $response[$i]->name
+     'snippet' => theme('jbrowse_search_result__'.strtolower($type), array('result' => $response[$i]))
 	  );
 	}
 
@@ -170,12 +171,10 @@ function _jbrowse_search_nice_field_name($field_name) {
 function theme_jbrowse_search_result($variables) {
   $result = $variables['result'];
   $output = '<dl class="dl-horizontal">';
-  $output .= '<dt>Result type</dt><dd><i class="fa fa-tag"></i> ' . $result->type . '</dd>';
-  foreach ($result->fields as $name => $value) {
-    $nice_name = _jbrowse_search_nice_field_name($name);
-    $output .= '<dt>'.$nice_name.'</dt>';
-    $output .= '<dd>'.$value.'</dd>';
-  }
+  $output .= '<dt>Name</dt><dd>' . $result->name . '</dd>';
+  $output .= '<dt>Location</dt><dd>' .
+    $result->location->ref . ':' . $result->location->start . '..' . $result->location->end .
+    '</dd>';
   $output .= '</dl>';
   return $output;
 }
