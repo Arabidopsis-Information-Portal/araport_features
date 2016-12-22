@@ -139,7 +139,7 @@ function new_homepage_06242015_default_page_manager_pages() {
           0 => 'box_1',
           1 => 'jbrowse_box',
           2 => 'science_apps_box',
-          3 => 'blast_box',
+          3 => 'eplant_box',
         ),
         'parent' => 'main',
         'class' => '',
@@ -163,16 +163,16 @@ function new_homepage_06242015_default_page_manager_pages() {
         'class' => '',
         'hide_empty' => 0,
       ),
-      'science_apps_box' => array(
+      'eplant_box' => array(
         'type' => 'region',
-        'title' => 'Blast Box',
+        'title' => 'BAR ePlant Box',
         'width' => '26.968350282713537',
         'width_type' => '%',
         'parent' => '3',
         'class' => '',
         'hide_empty' => 0,
       ),
-      'blast_box' => array(
+      'science_apps_box' => array(
         'type' => 'region',
         'title' => 'App Store Box',
         'width' => '27.092928892480213',
@@ -222,8 +222,8 @@ function new_homepage_06242015_default_page_manager_pages() {
       'araport_whereabouts' => NULL,
       'box_1' => NULL,
       'jbrowse_box' => NULL,
+      'eplant_box' => NULL,
       'science_apps_box' => NULL,
-      'blast_box' => NULL,
       'search_options' => array(
         'style' => 'Main_Search_Region',
       ),
@@ -281,7 +281,7 @@ function new_homepage_06242015_default_page_manager_pages() {
     $display->panels['araport_whereabouts'][0] = 'new-c4b8c283-17f6-4526-ae49-6032364cdd78';
     $pane = new stdClass();
     $pane->pid = 'new-8aaecbc5-848b-43a0-8c51-568964febdf5';
-    $pane->panel = 'blast_box';
+    $pane->panel = 'science_apps_box';
     $pane->type = 'custom';
     $pane->subtype = 'custom';
     $pane->shown = TRUE;
@@ -312,7 +312,7 @@ function new_homepage_06242015_default_page_manager_pages() {
     $pane->locks = array();
     $pane->uuid = '8aaecbc5-848b-43a0-8c51-568964febdf5';
     $display->content['new-8aaecbc5-848b-43a0-8c51-568964febdf5'] = $pane;
-    $display->panels['blast_box'][0] = 'new-8aaecbc5-848b-43a0-8c51-568964febdf5';
+    $display->panels['science_apps_box'][0] = 'new-8aaecbc5-848b-43a0-8c51-568964febdf5';
     $pane = new stdClass();
     $pane->pid = 'new-5bdf5f0f-db5d-42d9-827b-a39c25aaac90';
     $pane->panel = 'bottom';
@@ -588,7 +588,7 @@ function new_homepage_06242015_default_page_manager_pages() {
     $display->panels['job_posting'][0] = 'new-b1726d3f-2c5d-4050-a833-caa8ae0eadca';
     $pane = new stdClass();
     $pane->pid = 'new-efc6a258-0d27-4e7b-8a30-6df6ea6e8170';
-    $pane->panel = 'science_apps_box';
+    $pane->panel = 'eplant_box';
     $pane->type = 'custom';
     $pane->subtype = 'custom';
     $pane->shown = TRUE;
@@ -597,12 +597,12 @@ function new_homepage_06242015_default_page_manager_pages() {
       'admin_title' => 'Top Box 4 Title',
       'title' => '',
       'body' => '<div class="top-box">
-<h2>BLAST</h2>
+<h2>BAR ePlant</h2>
 </div>
 
-<div class="top-box4-block" onclick="window.open(\'welcome-blast\')" style="cursor: pointer;"></div>
+<div class="top-box4-block" onclick="window.open(\'eplant\')" style="cursor: pointer;"></div>
 
-<div class="top-box-desc" onclick="window.open(\'welcome-blast\')" style="cursor: pointer;"><p>Click to search against Col-0 data and other plant proteomes.</p></div>',
+<div class="top-box-desc" onclick="window.open(\'eplant\')" style="cursor: pointer;"><p>Visual analytic tool for exploring multiple levels of Arabidopsis data.</p></div>',
       'format' => 'full_html',
       'substitute' => TRUE,
     );
@@ -619,7 +619,7 @@ function new_homepage_06242015_default_page_manager_pages() {
     $pane->locks = array();
     $pane->uuid = 'efc6a258-0d27-4e7b-8a30-6df6ea6e8170';
     $display->content['new-efc6a258-0d27-4e7b-8a30-6df6ea6e8170'] = $pane;
-    $display->panels['science_apps_box'][0] = 'new-efc6a258-0d27-4e7b-8a30-6df6ea6e8170';
+    $display->panels['eplant_box'][0] = 'new-efc6a258-0d27-4e7b-8a30-6df6ea6e8170';
     $pane = new stdClass();
     $pane->pid = 'new-20c78078-5550-4758-8af3-34c9511b7b05';
     $pane->panel = 'search_options';
